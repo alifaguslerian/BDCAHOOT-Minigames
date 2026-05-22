@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Play — BDCAHOOT</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- LOBBY / WAITING SCREEN -->
+  <div id="lobbyScreen" class="lobby-screen">
+    <div class="tag tag-green" style="margin-bottom:24px;">
+      <span class="pulse-dot"></span> Connected
+    </div>
+    <h1 style="font-size:40px;margin-bottom:8px;">You're in! 🎉</h1>
+    <p class="text-muted" style="margin-bottom:8px;" id="quizTitleDisplay">Loading quiz info...</p>
+
+    <div class="lobby-code-display">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:8px;">Room Code</div>
+      <div class="lobby-code" id="lobbyCodeDisplay">------</div>
+    </div>
+
+    <div style="margin-bottom:32px;">
+      <div style="font-size:24px;font-weight:800;margin-bottom:4px;" id="playerNameDisplay">—</div>
+      <p class="text-muted" style="font-size:14px;">
+        <span class="pulse-dot"></span>
+        Waiting for host to start...
+      </p>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:16px 24px;display:flex;gap:16px;align-items:center;">
+      <span style="font-size:28px;">🎮</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px;">Get Ready</div>
+        <div style="font-size:12px;color:var(--text-muted);">Answer fast for more points!</div>
+      </div>
+    </div>
+
+    <button class="btn btn-ghost btn-sm" style="margin-top:24px;" onclick="window.location.href='/'">Leave Room</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" style="display:none;" class="game-layout">
+
+    <!-- Main game area -->
+    <div class="game-main">
+
+      <!-- Top bar -->
+      <div class="game-topbar">
+        <button class="btn btn-ghost btn-sm" onclick="if(confirm('Leave game?'))window.location.href='/'">
+          ✕ Leave Room
+        </button>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 18px;">
+          <span style="font-size:13px;font-weight:700;" id="qProgressDisplay">Q1 / ?</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:14px;color:var(--text-secondary);">👥</span>
+          <span style="font-size:14px;font-weight:700;" id="playerCountDisplay">—</span>
+        </div>
+      </div>
+
+      <!-- Question area -->
+      <div class="game-question-area">
+
+        <!-- Circular timer -->
+        <div class="timer-circle" id="timerCircle">
+          <svg class="timer-svg" viewBox="0 0 100 100">
+            <circle class="timer-track" cx="50" cy="50" r="42" />
+            <circle class="timer-progress" id="timerProgress" cx="50" cy="50" r="42" />
+          </svg>
+          <div class="timer-number" id="timerNumber">—</div>
+        </div>
+
+        <!-- Question text -->
+        <div class="question-text" id="questionText">
+          Get ready...
+        </div>
+
+        <!-- Answer buttons -->
+        <div class="answers-grid" id="answersGrid">
+          <button class="answer-btn" data-index="0">
+            <div class="answer-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16"><polygon points="8,2 14,14 2,14"/></svg>
+            </div>
+            <span class="answer-text">—</span>
+          </button>
+          <button class="answer-btn" data-index="1">
+            <div class="answer-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16"><polygon points="8,8 8,8 12,2 12,14 4,14 4,2" style="clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)"/><rect x="3" y="3" width="10" height="10" rx="2" transform="rotate(45 8 8)" width="9" height="9"/></svg>
+            </div>
+            <span class="answer-text">—</span>
+          </button>
+          <button class="answer-btn" data-index="2">
+            <div class="answer-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/></svg>
+            </div>
+            <span class="answer-text">—</span>
+          </button>
+          <button class="answer-btn" data-index="3">
+            <div class="answer-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/></svg>
+            </div>
+            <span class="answer-text">—</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Leaderboard sidebar -->
+    <div class="game-sidebar">
+      <div class="sidebar-header">
+        <h3>Live Ranks</h3>
+        <span>Top 5 Players</span>
+      </div>
+
+      <div class="leaderboard-list" id="leaderboardList"></div>
+
+      <div class="sidebar-your-rank">
+        <div class="your-rank-label">Your Rank</div>
+        <div class="your-rank-card">
+          <span style="font-size:20px;font-weight:800;color:var(--cyan);width:32px;" id="yourRankNum">—</span>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;" id="yourRankName">You</div>
+            <div style="font-size:12px;color:var(--text-muted);" id="yourRankScore">0 pts</div>
+          </div>
+          <span id="yourRankArrow" style="font-size:14px;"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FEEDBACK OVERLAY -->
+  <div class="feedback-overlay" id="feedbackOverlay">
+    <div class="feedback-icon" id="feedbackIcon">✅</div>
+    <div class="feedback-label" id="feedbackLabel">Correct!</div>
+    <div class="feedback-pts" id="feedbackPts">+1000 pts</div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/socket.js"></script>
+  <script src="/js/player.js"></script>
+</body>
+</html>

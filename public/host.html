@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Host — BDCAHOOT</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="window.location.href='/'">BDC<span>AH</span>OOT</div>
+    <div class="navbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='/'">← Home</button>
+      <button class="btn btn-primary btn-sm" onclick="window.location.href='/create-quiz.html'">+ Create Quiz</button>
+    </div>
+  </nav>
+
+  <!-- SETUP SCREEN (select quiz) -->
+  <div id="setupScreen" style="max-width:680px;margin:0 auto;padding:100px 20px 60px;">
+    <div style="margin-bottom:36px;">
+      <h1 style="font-size:36px;margin-bottom:8px;">Host a Game</h1>
+      <p class="text-muted">Select a quiz and start your room</p>
+    </div>
+
+    <div class="quiz-meta-card">
+      <div class="form-group">
+        <label>Select Quiz</label>
+        <select class="form-control" id="quizSelect">
+          <option value="">Loading quizzes...</option>
+        </select>
+      </div>
+
+      <div id="quizInfo" style="display:none;margin-top:16px;">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <span class="tag tag-blue" id="quizQCount"></span>
+          <span class="text-muted" style="font-size:14px;" id="quizName"></span>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <button class="btn btn-primary" style="width:100%;" id="startHostingBtn">
+          Start Room →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOST GAME SCREEN -->
+  <div id="hostScreen" style="display:none;">
+    <div class="host-layout">
+
+      <!-- Main area -->
+      <div class="host-main">
+
+        <!-- Room Code -->
+        <div class="host-room-code-display">
+          <div class="room-code-label">Room Code</div>
+          <div class="room-code-value" id="displayRoomCode">------</div>
+          <p style="margin-top:12px;color:rgba(255,255,255,0.6);font-size:14px;">
+            Share this code with players at <strong>bdcahoot.app</strong>
+          </p>
+        </div>
+
+        <!-- Game status + controls -->
+        <div id="lobbyControls">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <span class="pulse-dot"></span>
+            <span id="waitingText">Waiting for players to join...</span>
+          </div>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-lg" id="startGameBtn" disabled>
+              ▶ Start Game (<span id="playerCountLabel">0</span> players)
+            </button>
+            <button class="btn btn-ghost btn-sm" id="endHostBtn">
+              ✕ End Room
+            </button>
+          </div>
+        </div>
+
+        <!-- In-game controls -->
+        <div id="gameControls" style="display:none;">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;margin-bottom:20px;">
+            <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px;">
+              Current Question
+            </div>
+            <div id="hostQuestionText" style="font-size:22px;font-weight:700;margin-bottom:16px;">—</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span class="tag tag-green" id="hostQProgress">Q1 / 1</span>
+              <span id="hostTimerDisplay" style="color:var(--text-secondary);font-size:14px;"></span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-solid" id="nextQuestionBtn">
+              Next Question →
+            </button>
+            <button class="btn btn-ghost btn-sm" id="endGameBtn">
+              End Game
+            </button>
+          </div>
+        </div>
+
+        <!-- Answer reveal (shown between questions) -->
+        <div id="answerRevealArea" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;">
+          <div style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;">Correct Answer</div>
+          <div id="hostCorrectAnswer" style="font-size:20px;font-weight:700;color:var(--green);"></div>
+          <div style="margin-top:16px;color:var(--text-secondary);font-size:14px;" id="hostAnswerStats"></div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar: player list / leaderboard -->
+      <div class="host-sidebar">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h3 style="font-size:16px;font-weight:700;" id="sidebarTitle">Players</h3>
+          <span class="tag tag-blue" id="sidebarCount">0</span>
+        </div>
+
+        <div class="player-list" id="playerListEl"></div>
+        <div class="leaderboard-list" id="hostLeaderboardEl" style="display:none;"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/socket.js"></script>
+  <script src="/js/host.js"></script>
+</body>
+</html>

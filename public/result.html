@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Results — BDCAHOOT</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="result-page">
+
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="window.location.href='/'">BDC<span>AH</span>OOT</div>
+    <button class="btn btn-solid btn-sm" onclick="window.location.href='/'">Back to Lobby</button>
+  </nav>
+
+  <div style="max-width:720px;margin:0 auto;padding:0 20px;">
+
+    <!-- Victory header -->
+    <div class="result-header">
+      <div class="victory-text">VICTORY</div>
+      <p class="result-subtitle">Final Rankings</p>
+    </div>
+
+    <!-- Podium -->
+    <div class="podium-container" id="podiumContainer">
+      <!-- Rendered by JS -->
+    </div>
+
+    <!-- Top 10 -->
+    <div class="top10-card">
+      <div class="top10-header">
+        <h3>Top 10 Players</h3>
+        <span style="font-size:20px;">📊</span>
+      </div>
+      <div class="top10-list" id="top10List">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="result-actions">
+      <button class="btn btn-ghost btn-lg" onclick="window.location.href='/'">
+        View Details
+      </button>
+      <button class="btn btn-solid btn-lg" onclick="window.location.href='/'">
+        Play Again ↺
+      </button>
+    </div>
+
+  </div>
+
+  <script src="/js/result.js"></script>
+</body>
+</html>

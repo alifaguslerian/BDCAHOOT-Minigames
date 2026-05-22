@@ -1,0 +1,31 @@
+[
+  {
+    "id": "quiz001",
+    "title": "General Knowledge",
+    "questions": [
+      {
+        "question": "What is the capital city of Indonesia?",
+        "options": ["Jakarta", "Bandung", "Surabaya", "Medan"],
+        "correctAnswer": 0,
+        "timeLimit": 20
+      },
+      {
+        "question": "Which programming language is known as the language of the web?",
+        "options": ["Python", "Java", "JavaScript", "C++"],
+        "correctAnswer": 2,
+        "timeLimit": 15
+      },
+      {
+        "question": "What does HTML stand for?",
+        "options": [
+          "Hyper Text Markup Language",
+          "High Tech Modern Language",
+          "Hyper Transfer Markup Logic",
+          "Home Tool Markup Language"
+        ],
+        "correctAnswer": 0,
+        "timeLimit": 20
+      }
+    ]
+  }
+]

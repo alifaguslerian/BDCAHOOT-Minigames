@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Quiz — BDCAHOOT</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="window.location.href='/'">BDC<span>AH</span>OOT</div>
+    <div class="navbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='/host.html'">← Back to Host</button>
+    </div>
+  </nav>
+
+  <div class="create-layout">
+
+    <div class="create-header">
+      <h1>Create a Quiz</h1>
+      <p class="text-muted">Build your question set and save it for hosting</p>
+    </div>
+
+    <!-- Quiz title + settings -->
+    <div class="quiz-meta-card">
+      <div class="form-group">
+        <label>Quiz Title</label>
+        <input type="text" class="form-control" id="quizTitle" placeholder="e.g. IT Fundamentals Quiz" maxlength="80" />
+      </div>
+    </div>
+
+    <!-- Questions container -->
+    <div id="questionsContainer"></div>
+
+    <!-- Add question button -->
+    <button class="btn btn-ghost" id="addQuestionBtn" style="width:100%;margin-bottom:24px;border-style:dashed;">
+      + Add Question
+    </button>
+
+    <!-- Save button -->
+    <div style="display:flex;gap:12px;">
+      <button class="btn btn-primary btn-lg" style="flex:1;" id="saveQuizBtn">
+        Save Quiz ✓
+      </button>
+      <button class="btn btn-ghost" onclick="window.location.href='/host.html'">
+        Cancel
+      </button>
+    </div>
+
+    <div class="error-msg" id="saveError" style="margin-top:12px;font-size:14px;"></div>
+    <div style="display:none;margin-top:12px;color:var(--green);font-size:14px;font-weight:600;" id="saveSuccess">
+      ✓ Quiz saved! Redirecting...
+    </div>
+
+  </div>
+
+  <script src="/js/createQuiz.js"></script>
+</body>
+</html>

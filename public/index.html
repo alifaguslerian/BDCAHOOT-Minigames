@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BDCAHOOT — Multiplayer Quiz Platform</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">BDC<span>AH</span>OOT</div>
+    <div class="navbar-actions">
+      <button class="btn btn-ghost btn-sm" id="navJoinBtn">Join</button>
+      <button class="btn btn-solid btn-sm" onclick="window.location.href='/host.html'">Host</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <!-- Floating decorative elements -->
+    <div class="floating-objects" aria-hidden="true">
+      <div class="float-obj">🎲</div>
+      <div class="float-obj">🎮</div>
+      <div class="float-obj">🃏</div>
+      <div class="float-obj">🕹️</div>
+      <div class="float-obj">🎯</div>
+      <div class="float-obj">♟️</div>
+      <div class="float-obj">⚡</div>
+    </div>
+
+    <h1 class="hero-title">BDCAHOOT</h1>
+    <p class="hero-subtitle">The multiplayer quiz platform for communities and events.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary btn-lg" id="heroJoinBtn">
+        JOIN GAME ▶
+      </button>
+      <button class="btn btn-outline btn-lg" onclick="window.location.href='/host.html'">
+        HOST GAME ⊕
+      </button>
+    </div>
+  </section>
+
+  <!-- MINI-GAMES SECTION -->
+  <section class="mini-games-section">
+    <div style="max-width:1100px;margin:0 auto;">
+      <h2 class="section-title">Mini-Games</h2>
+      <div class="mini-games-grid">
+
+        <!-- Kahoot -->
+        <div class="game-card kahoot-card" onclick="document.getElementById('heroJoinBtn').click()">
+          <div class="game-card-icon">🧠</div>
+          <div class="game-card-overlay"></div>
+          <div class="game-card-content">
+            <div class="game-card-info">
+              <h3>Kahoot</h3>
+              <p>Multiplayer Quiz</p>
+            </div>
+            <button class="btn btn-ghost btn-sm">PLAY</button>
+          </div>
+        </div>
+
+        <!-- Uno -->
+        <div class="game-card uno-card" style="cursor:not-allowed;">
+          <div class="game-card-icon">🃏</div>
+          <div class="game-card-overlay"></div>
+          <div class="game-card-badge">COMING SOON</div>
+          <div class="game-card-content">
+            <div class="game-card-info">
+              <h3>Uno</h3>
+              <p>Card Game</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Catur -->
+        <div class="game-card chess-card" style="cursor:not-allowed;">
+          <div class="game-card-icon">♟️</div>
+          <div class="game-card-overlay"></div>
+          <div class="game-card-badge">COMING SOON</div>
+          <div class="game-card-content">
+            <div class="game-card-info">
+              <h3>Catur</h3>
+              <p>Strategy Board Game</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">BDCAHOOT</div>
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </div>
+    <p class="footer-copy">© 2024 BDCAHOOT. Play Hard.</p>
+  </footer>
+
+  <!-- JOIN MODAL -->
+  <div class="modal-overlay" id="joinModal">
+    <div class="modal" style="position:relative;">
+      <button class="modal-close" id="closeJoinModal">✕</button>
+      <h2>Join a Game</h2>
+      <p>Enter the room code and your name to join</p>
+
+      <div class="form-group">
+        <label>Room Code</label>
+        <input
+          type="text"
+          class="form-control room-code"
+          id="roomCodeInput"
+          placeholder="ABC123"
+          maxlength="6"
+          autocomplete="off"
+        />
+        <span class="error-msg" id="roomCodeError">Room not found. Check your code.</span>
+      </div>
+
+      <div class="form-group">
+        <label>Your Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="playerNameInput"
+          placeholder="Enter your name"
+          maxlength="20"
+          autocomplete="off"
+        />
+        <span class="error-msg" id="playerNameError">Please enter your name.</span>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="joinSubmitBtn">
+        Join Game →
+      </button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/socket.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
