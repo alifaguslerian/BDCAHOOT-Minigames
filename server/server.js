@@ -74,7 +74,7 @@ io.on('connection', (socket) => {
   });
 
   // ----- PLAYER: Join Room -----
-  socket.on('join-room', ({ code, playerName }) => {
+  socket.on('join-room', ({ code, playerName, avatar, avatarBg }) => {
     const room = roomManager.getRoom(code);
 
     if (!room) {
@@ -86,27 +86,25 @@ io.on('connection', (socket) => {
       return;
     }
 
-    const player = roomManager.addPlayer(code, socket.id, playerName);
+    const player = roomManager.addPlayer(code, socket.id, playerName, avatar, avatarBg);
     if (!player) {
       socket.emit('join-error', { message: 'Name already taken. Choose another name.' });
       return;
     }
 
     socket.join(code);
-    socket.emit('room-joined', {
-      code,
-      playerName,
-      quizTitle: room.quiz.title
-    });
+    socket.emit('room-joined', { code, playerName, quizTitle: room.quiz.title });
 
-    // Notify everyone (host + players) of updated player list
     const players = roomManager.getPlayerList(code);
     io.to(code).emit('player-list-updated', {
-      players: players.map(p => ({ name: p.name, score: p.score })),
+      players: players.map(p => ({
+        name: p.name,
+        avatar: p.avatar,
+        avatarBg: p.avatarBg,
+        score: p.score
+      })),
       count: players.length
     });
-
-    console.log(`[Room] ${playerName} joined ${code}`);
   });
 
   // ----- HOST: Start Game -----

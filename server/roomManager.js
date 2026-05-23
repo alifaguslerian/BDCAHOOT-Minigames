@@ -57,20 +57,21 @@ function deleteRoom(code) {
   rooms.delete(code);
 }
 
-function addPlayer(code, socketId, playerName) {
+function addPlayer(code, socketId, playerName, avatar, avatarBg) {
   const room = getRoom(code);
   if (!room) return null;
 
-  // Prevent duplicate names
   for (const [, player] of room.players) {
     if (player.name.toLowerCase() === playerName.toLowerCase()) {
-      return null; // name taken
+      return null;
     }
   }
 
   const player = {
     id: socketId,
     name: playerName,
+    avatar: avatar || '🎮',
+    avatarBg: avatarBg || '#1A2A6C',
     score: 0,
     rank: room.players.size + 1,
     answered: false

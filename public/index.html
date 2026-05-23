@@ -122,27 +122,46 @@
       <a href="#">Privacy</a>
       <a href="#">Terms</a>
     </div>
-    <p class="footer-copy">© 2024 BDCAHOOT. Play Hard.</p>
+    <p class="footer-copy">© 2026 BDCAHOOT. Play Hard.</p>
   </footer>
 
+  <!-- JOIN MODAL -->
   <div class="modal-overlay" id="joinModal">
-    <div class="modal" style="position:relative;">
+    <div class="modal" style="position:relative;max-width:500px;">
       <button class="modal-close" id="closeJoinModal">✕</button>
       <h2>Join a Game</h2>
       <p>Enter the room code and your name to join</p>
-      <div class="form-group">
-        <label>Room Code</label>
-        <input type="text" class="form-control room-code" id="roomCodeInput" placeholder="ABC123" maxlength="6"
-          autocomplete="off" />
-        <span class="error-msg" id="roomCodeError"></span>
+
+      <!-- Layout: avatar kiri, form kanan -->
+      <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;">
+
+        <!-- Avatar picker -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0;">
+          <div class="avatar-preview" id="avatarPreview">🎮</div>
+          <div class="avatar-grid" id="avatarGrid"></div>
+        </div>
+
+        <!-- Form -->
+        <div style="flex:1;min-width:0;">
+          <div class="form-group">
+            <label>Room Code</label>
+            <input type="text" class="form-control room-code" id="roomCodeInput" placeholder="ABC123" maxlength="6"
+              autocomplete="off" />
+            <span class="error-msg" id="roomCodeError"></span>
+          </div>
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" class="form-control" id="playerNameInput" placeholder="Enter your name" maxlength="20"
+              autocomplete="off" />
+            <span class="error-msg" id="playerNameError"></span>
+          </div>
+        </div>
+
       </div>
-      <div class="form-group">
-        <label>Your Name</label>
-        <input type="text" class="form-control" id="playerNameInput" placeholder="Enter your name" maxlength="20"
-          autocomplete="off" />
-        <span class="error-msg" id="playerNameError"></span>
-      </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="joinSubmitBtn">Join Game →</button>
+
+      <button class="btn btn-primary" style="width:100%;" id="joinSubmitBtn">
+        Join Game →
+      </button>
     </div>
   </div>
 

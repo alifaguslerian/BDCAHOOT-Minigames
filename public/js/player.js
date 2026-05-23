@@ -1,37 +1,37 @@
 // player.js — Player game logic
 
-const lobbyScreen    = document.getElementById('lobbyScreen');
-const gameScreen     = document.getElementById('gameScreen');
+const lobbyScreen = document.getElementById('lobbyScreen');
+const gameScreen = document.getElementById('gameScreen');
 const lobbyCodeDisplay = document.getElementById('lobbyCodeDisplay');
 const playerNameDisplay = document.getElementById('playerNameDisplay');
-const quizTitleDisplay  = document.getElementById('quizTitleDisplay');
-const qProgressDisplay  = document.getElementById('qProgressDisplay');
+const quizTitleDisplay = document.getElementById('quizTitleDisplay');
+const qProgressDisplay = document.getElementById('qProgressDisplay');
 const playerCountDisplay = document.getElementById('playerCountDisplay');
-const questionText   = document.getElementById('questionText');
-const answersGrid    = document.getElementById('answersGrid');
-const timerNumber    = document.getElementById('timerNumber');
-const timerProgress  = document.getElementById('timerProgress');
+const questionText = document.getElementById('questionText');
+const answersGrid = document.getElementById('answersGrid');
+const timerNumber = document.getElementById('timerNumber');
+const timerProgress = document.getElementById('timerProgress');
 const leaderboardList = document.getElementById('leaderboardList');
-const yourRankNum    = document.getElementById('yourRankNum');
-const yourRankName   = document.getElementById('yourRankName');
-const yourRankScore  = document.getElementById('yourRankScore');
+const yourRankNum = document.getElementById('yourRankNum');
+const yourRankName = document.getElementById('yourRankName');
+const yourRankScore = document.getElementById('yourRankScore');
 const feedbackOverlay = document.getElementById('feedbackOverlay');
-const feedbackIcon   = document.getElementById('feedbackIcon');
-const feedbackLabel  = document.getElementById('feedbackLabel');
-const feedbackPts    = document.getElementById('feedbackPts');
+const feedbackIcon = document.getElementById('feedbackIcon');
+const feedbackLabel = document.getElementById('feedbackLabel');
+const feedbackPts = document.getElementById('feedbackPts');
 
 const playerName = sessionStorage.getItem('playerName') || 'Player';
-const roomCode   = sessionStorage.getItem('roomCode')   || '';
-const quizTitle  = sessionStorage.getItem('quizTitle')  || 'Quiz';
+const roomCode = sessionStorage.getItem('roomCode') || '';
+const quizTitle = sessionStorage.getItem('quizTitle') || 'Quiz';
 
 // Guard: if no room code stored, redirect to home
 if (!roomCode) window.location.href = '/';
 
 // Set lobby info
-lobbyCodeDisplay.textContent  = roomCode;
+lobbyCodeDisplay.textContent = roomCode;
 playerNameDisplay.textContent = playerName;
-quizTitleDisplay.textContent  = quizTitle;
-yourRankName.textContent      = playerName;
+quizTitleDisplay.textContent = quizTitle;
+yourRankName.textContent = playerName;
 
 let currentTimeLimit = 20;
 let hasAnswered = false;
@@ -52,7 +52,7 @@ window.socket.on('player-list-updated', (data) => {
 // ---- Game started ----
 window.socket.on('game-started', () => {
   lobbyScreen.style.display = 'none';
-  gameScreen.style.display  = 'grid';
+  gameScreen.style.display = 'grid';
   startCountdown(); // countdown sebelum soal pertama
 });
 
@@ -91,7 +91,7 @@ window.socket.on('timer-update', (data) => {
   // Animate progress ring
   const circumference = 263;
   const progress = timeLeft / currentTimeLimit;
-  const offset   = circumference * (1 - progress);
+  const offset = circumference * (1 - progress);
   timerProgress.style.strokeDashoffset = offset;
 
   // Color feedback
@@ -133,15 +133,15 @@ function lockAnswers(selectedBtn = null) {
 // ---- Answer result ----
 window.socket.on('answer-result', (data) => {
   if (data.correct) {
-    feedbackIcon.textContent  = '✅';
+    feedbackIcon.textContent = '✅';
     feedbackLabel.textContent = 'Correct!';
     feedbackLabel.style.color = 'var(--green)';
-    feedbackPts.textContent   = `+${data.score.toLocaleString()} pts`;
+    feedbackPts.textContent = `+${data.score.toLocaleString()} pts`;
   } else {
-    feedbackIcon.textContent  = '❌';
+    feedbackIcon.textContent = '❌';
     feedbackLabel.textContent = 'Wrong!';
     feedbackLabel.style.color = '#FF5252';
-    feedbackPts.textContent   = '0 pts';
+    feedbackPts.textContent = '0 pts';
   }
 
   feedbackOverlay.classList.add('show');
@@ -177,20 +177,27 @@ window.socket.on('leaderboard-updated', (data) => {
 });
 
 function renderLeaderboard(board) {
+  const myAvatar = sessionStorage.getItem('playerAvatar') || '🎮';
+  const myAvatarBg = sessionStorage.getItem('playerAvatarBg') || '#1A2A6C';
   const top5 = board.slice(0, 5);
   const myEntry = board.find(p => p.name === playerName);
 
-  leaderboardList.innerHTML = top5.map((p, i) => `
-    <div class="lb-item ${i < 3 ? 'top-3' : ''} ${p.name === playerName ? 'is-you' : ''}">
-      <div class="lb-rank">${p.rank}</div>
-      <div class="lb-avatar">${p.name.substring(0, 2).toUpperCase()}</div>
-      <div class="lb-name">${p.name}${p.name === playerName ? ' (You)' : ''}</div>
-      <div class="lb-score">${p.score.toLocaleString()}</div>
-    </div>
-  `).join('');
+  leaderboardList.innerHTML = top5.map((p, i) => {
+    const isMe = p.name === playerName;
+    const emoji = isMe ? myAvatar : (p.avatar || p.name.substring(0, 2).toUpperCase());
+    const bg = isMe ? myAvatarBg : (p.avatarBg || '#1A2A6C');
+    return `
+      <div class="lb-item ${i < 3 ? 'top-3' : ''} ${isMe ? 'is-you' : ''}">
+        <div class="lb-rank">${p.rank}</div>
+        <div class="lb-avatar" style="background:${bg};font-size:14px;">${emoji}</div>
+        <div class="lb-name">${p.name}${isMe ? ' (You)' : ''}</div>
+        <div class="lb-score">${p.score.toLocaleString()}</div>
+      </div>
+    `;
+  }).join('');
 
   if (myEntry) {
-    yourRankNum.textContent   = '#' + myEntry.rank;
+    yourRankNum.textContent = '#' + myEntry.rank;
     yourRankScore.textContent = myEntry.score.toLocaleString() + ' pts';
   }
 }
