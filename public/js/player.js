@@ -53,6 +53,7 @@ window.socket.on('player-list-updated', (data) => {
 window.socket.on('game-started', () => {
   lobbyScreen.style.display = 'none';
   gameScreen.style.display  = 'grid';
+  startCountdown(); // countdown sebelum soal pertama
 });
 
 // ---- New question ----
