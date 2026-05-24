@@ -129,9 +129,9 @@ io.on('connection', (socket) => {
   socket.on('next-question', () => {
     const room = roomManager.findRoomBySocket(socket.id);
     if (!room || room.hostId !== socket.id) return;
+    if (room.state !== 'reviewing') return; // guard: hanya bisa next kalau lagi di fase review
     sendNextQuestion(room);
   });
-
   // ----- PLAYER: Submit Answer -----
   socket.on('submit-answer', ({ answerIndex }) => {
     const room = roomManager.findRoomBySocket(socket.id);
