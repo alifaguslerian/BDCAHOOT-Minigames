@@ -130,44 +130,70 @@ function lockAnswers(selectedBtn = null) {
   });
 }
 
-// ---- Answer result ----
-window.socket.on('answer-result', (data) => {
-  if (data.correct) {
-    feedbackIcon.textContent = '✅';
-    feedbackLabel.textContent = 'Correct!';
-    feedbackLabel.style.color = 'var(--green)';
-    feedbackPts.textContent = `+${data.score.toLocaleString()} pts`;
-  } else {
-    feedbackIcon.textContent = '❌';
-    feedbackLabel.textContent = 'Wrong!';
-    feedbackLabel.style.color = '#FF5252';
-    feedbackPts.textContent = '0 pts';
-  }
-
+// Konfirmasi jawaban diterima — lock UI tapi belum kasih tau benar/salah
+window.socket.on('answer-received', () => {
+  // Tampilkan state "menunggu"
+  feedbackIcon.textContent  = '⏳';
+  feedbackLabel.textContent = 'Answered!';
+  feedbackLabel.style.color = 'var(--cyan)';
+  feedbackPts.textContent   = 'Waiting for timer...';
   feedbackOverlay.classList.add('show');
+});
 
-  // Update personal score display
-  yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';
+// ---- Answer result ----
+// Timer habis — sekarang baru kasih tau hasilnya
+window.socket.on('answer-result', (data) => {
+  feedbackOverlay.classList.remove('show');
 
-  // Auto-hide feedback after 1.5s
   setTimeout(() => {
-    feedbackOverlay.classList.remove('show');
-  }, 1800);
+    if (data.correct) {
+      feedbackIcon.textContent  = '✅';
+      feedbackLabel.textContent = 'Correct!';
+      feedbackLabel.style.color = 'var(--green)';
+      feedbackPts.textContent   = `+${data.score.toLocaleString()} pts`;
+    } else {
+      feedbackIcon.textContent  = '❌';
+      feedbackLabel.textContent = 'Wrong!';
+      feedbackLabel.style.color = '#FF5252';
+      feedbackPts.textContent   = '0 pts';
+    }
+
+    yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';
+    feedbackOverlay.classList.add('show');
+
+    setTimeout(() => feedbackOverlay.classList.remove('show'), 2000);
+  }, 300);
 });
 
 // ---- Answer reveal (correct answer shown) ----
 window.socket.on('answer-reveal', (data) => {
   const correctIdx = data.correctAnswer;
+  const distribution = data.distribution || [0, 0, 0, 0];
+  const total = data.totalPlayers || 1;
+
   const btns = answersGrid.querySelectorAll('.answer-btn');
   btns.forEach((btn, i) => {
     btn.disabled = true;
+    const count = distribution[i] || 0;
+    const pct   = Math.round((count / total) * 100);
+
     if (i === correctIdx) {
       btn.classList.add('correct');
       btn.style.opacity = '1';
     } else {
       btn.classList.add('wrong');
-      btn.style.opacity = '0.4';
+      btn.style.opacity = '0.5';
     }
+
+    // Tambah bar distribusi di dalam button
+    btn.innerHTML = `
+      <div class="answer-icon">${btn.querySelector('.answer-icon').innerHTML}</div>
+      <span class="answer-text">${btn.querySelector('.answer-text').textContent}</span>
+      <div class="answer-dist">
+        <div class="answer-dist-bar" style="width:${pct}%"></div>
+        <span class="answer-dist-label">${count}</span>
+      </div>
+    `;
   });
 });
 

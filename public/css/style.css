@@ -1786,3 +1786,34 @@ footer {
   box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
   transform: scale(1.1);
 }
+
+/* Answer distribution bar */
+.answer-dist {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.answer-dist-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 3px;
+  flex: 1;
+  transition: width 0.5s ease;
+  min-width: 2px;
+}
+
+.answer-btn.correct .answer-dist-bar { background: var(--green); }
+.answer-btn.wrong   .answer-dist-bar { background: rgba(255,255,255,0.2); }
+
+.answer-dist-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  min-width: 16px;
+  text-align: right;
+  flex-shrink: 0;
+}

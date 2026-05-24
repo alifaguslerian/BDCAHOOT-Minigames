@@ -138,15 +138,14 @@ io.on('connection', (socket) => {
     if (!room) return;
 
     const result = gameLogic.submitAnswer(room, socket.id, answerIndex);
-    if (!result) return; // invalid / duplicate
+    if (!result) return;
 
-    // Send result only to the answering player
-    socket.emit('answer-result', result);
+    // Jangan kirim result sekarang — simpan dulu, kirim pas timer habis
+    // Cukup konfirmasi bahwa jawaban sudah diterima
+    socket.emit('answer-received');
 
-    // If all players answered, reveal answer + send leaderboard early
-    if (gameLogic.allPlayersAnswered(room)) {
-      revealAndLeaderboard(room);
-    }
+    // Hapus auto-reveal kalau semua sudah jawab
+    // Biarkan timer yang jadi penentu
   });
 
   // ----- HOST: End Game -----
@@ -234,12 +233,38 @@ function revealAndLeaderboard(room) {
   const question = room.quiz.questions[room.currentQuestionIndex];
   room.state = 'reviewing';
 
-  // Reveal correct answer to all
+  // Hitung distribusi jawaban
+  const distribution = [0, 0, 0, 0];
+  for (const [, player] of room.players) {
+    if (player.lastAnswer !== undefined && player.lastAnswer !== null) {
+      distribution[player.lastAnswer]++;
+    }
+  }
+
+  // Kirim result ke masing-masing player (benar/salah + poin)
+  for (const [socketId, player] of room.players) {
+    const playerSocket = io.sockets.sockets.get(socketId);
+    if (playerSocket && player.pendingResult) {
+      playerSocket.emit('answer-result', player.pendingResult);
+      player.pendingResult = null;
+    } else if (playerSocket) {
+      // Player tidak jawab
+      playerSocket.emit('answer-result', {
+        correct: false,
+        correctAnswer: question.correctAnswer,
+        score: 0,
+        totalScore: player.score
+      });
+    }
+  }
+
+  // Broadcast reveal + distribusi ke semua
   io.to(room.code).emit('answer-reveal', {
-    correctAnswer: question.correctAnswer
+    correctAnswer: question.correctAnswer,
+    distribution,
+    totalPlayers: room.players.size
   });
 
-  // Send updated leaderboard
   const leaderboard = gameLogic.getLeaderboard(room);
   io.to(room.code).emit('leaderboard-updated', { leaderboard });
 }

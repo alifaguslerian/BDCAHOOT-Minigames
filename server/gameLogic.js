@@ -50,7 +50,6 @@ function nextQuestion(room) {
  * Returns { correct, score, totalScore } or null if invalid
  */
 function submitAnswer(room, socketId, answerIndex) {
-  // Anti-cheat: ignore if already answered or not in question state
   if (room.state !== 'question') return null;
   if (room.answeredThisRound.has(socketId)) return null;
 
@@ -60,9 +59,9 @@ function submitAnswer(room, socketId, answerIndex) {
   const question = room.quiz.questions[room.currentQuestionIndex];
   const isCorrect = answerIndex === question.correctAnswer;
 
-  // Mark as answered (even if wrong — prevent re-submit)
   room.answeredThisRound.add(socketId);
   player.answered = true;
+  player.lastAnswer = answerIndex; // simpan jawaban untuk distribusi
 
   let earned = 0;
   if (isCorrect) {
@@ -72,12 +71,15 @@ function submitAnswer(room, socketId, answerIndex) {
     player.score += earned;
   }
 
-  return {
+  // Simpan result, kirim nanti pas timer habis
+  player.pendingResult = {
     correct: isCorrect,
     correctAnswer: question.correctAnswer,
     score: earned,
     totalScore: player.score
   };
+
+  return player.pendingResult;
 }
 
 /**
