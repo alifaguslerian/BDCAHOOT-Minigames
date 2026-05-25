@@ -270,7 +270,7 @@ function revealAndLeaderboard(room) {
     }
   }
 
-  // Kirim result ke masing-masing player
+  // Step 1: kirim answer-result ke tiap player dulu
   for (const [socketId, player] of room.players) {
     const playerSocket = io.sockets.sockets.get(socketId);
     if (!playerSocket) continue;
@@ -284,18 +284,19 @@ function revealAndLeaderboard(room) {
 
     playerSocket.emit('answer-result', result);
     player.pendingResult = null;
-    player.lastAnswer = null;
+    player.lastAnswer    = null;
   }
 
-  // Broadcast distribusi + leaderboard ke semua
+  // Step 2: kirim round-end setelah 2.5 detik (biar popup sempat keliatan)
   const leaderboard = gameLogic.getLeaderboard(room);
-
-  io.to(room.code).emit('round-end', {
-    correctAnswer: question.correctAnswer,
-    distribution,
-    totalPlayers: room.players.size,
-    leaderboard
-  });
+  setTimeout(() => {
+    io.to(room.code).emit('round-end', {
+      correctAnswer: question.correctAnswer,
+      distribution,
+      totalPlayers: room.players.size,
+      leaderboard
+    });
+  }, 2500);
 }
 /**
  * End the game and send final results

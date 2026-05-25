@@ -147,34 +147,33 @@ window.socket.on('answer-received', () => {
 // ---- Answer result ----
 // Timer habis — tampilkan hasil + leaderboard
 window.socket.on('answer-result', (data) => {
-  // Update feedback overlay dengan hasil
   feedbackOverlay.classList.remove('show');
 
   setTimeout(() => {
     if (data.correct) {
-      feedbackIcon.textContent = '✅';
+      feedbackIcon.textContent  = '✅';
       feedbackLabel.textContent = 'Correct!';
       feedbackLabel.style.color = 'var(--green)';
-      feedbackPts.textContent = `+${data.score.toLocaleString()} pts`;
+      feedbackPts.textContent   = `+${data.score.toLocaleString()} pts`;
       SFX.playCorrect();
     } else {
-      feedbackIcon.textContent = '❌';
+      feedbackIcon.textContent  = '❌';
       feedbackLabel.textContent = 'Wrong!';
       feedbackLabel.style.color = '#FF5252';
-      feedbackPts.textContent = '0 pts';
+      feedbackPts.textContent   = '0 pts';
       SFX.playWrong();
     }
 
     yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';
     feedbackOverlay.classList.add('show');
 
-    // Auto hide setelah 2 detik
-    setTimeout(() => feedbackOverlay.classList.remove('show'), 2000);
+    // Tidak auto-hide — round-end yang akan hide ini
   }, 300);
 });
 
 // Round end — update leaderboard + distribusi jawaban
 window.socket.on('round-end', (data) => {
+  feedbackOverlay.classList.remove('show');
   // Update answer buttons dengan distribusi
   const btns = answersGrid.querySelectorAll('.answer-btn');
   btns.forEach((btn, i) => {
