@@ -442,7 +442,32 @@ img {
   width: 260px;
   height: 260px;
   object-fit: contain;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.5));
+}
+
+@media (max-width: 768px) {
+  .hero-deco img {
+    width: 90px;
+    height: 90px;
+  }
+
+  /* Reposisi biar ga tabrakan di HP */
+  .hero-deco[style*="left:2%"],
+  .hero-deco[style*="left: 2%"] {
+    top: 55% !important;
+  }
+
+  .hero-deco[style*="right:1%"],
+  .hero-deco[style*="right: 1%"] {
+    top: 45% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-deco img {
+    width: 70px;
+    height: 70px;
+  }
 }
 
 .hero-title,
