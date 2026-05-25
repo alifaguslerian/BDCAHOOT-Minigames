@@ -1,13 +1,23 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
-});
+let pool = null;
 
-// Buat tabel kalau belum ada
+function getPool() {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+  }
+  return pool;
+}
+
 async function initDB() {
-  await pool.query(`
+  if (!process.env.DATABASE_URL) {
+    console.log('[DB] No DATABASE_URL — running in local JSON mode');
+    return;
+  }
+  await getPool().query(`
     CREATE TABLE IF NOT EXISTS quizzes (
       id TEXT PRIMARY KEY,
       title TEXT NOT NULL,
@@ -18,4 +28,4 @@ async function initDB() {
   console.log('[DB] Tables ready');
 }
 
-module.exports = { pool, initDB };
+module.exports = { getPool, initDB };
