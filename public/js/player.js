@@ -114,6 +114,8 @@ window.socket.on('timer-update', (data) => {
 
 // ---- Submit answer ----
 answersGrid.addEventListener('click', (e) => {
+  if (window.SFX) getCtx && SFX.playCorrect && getCtx();
+
   const btn = e.target.closest('.answer-btn');
   if (!btn || hasAnswered) return;
 
@@ -154,26 +156,19 @@ window.socket.on('answer-result', (data) => {
       feedbackLabel.textContent = 'Correct!';
       feedbackLabel.style.color = 'var(--green)';
       feedbackPts.textContent = `+${data.score.toLocaleString()} pts`;
+      SFX.playCorrect();
     } else {
       feedbackIcon.textContent = '❌';
       feedbackLabel.textContent = 'Wrong!';
       feedbackLabel.style.color = '#FF5252';
       feedbackPts.textContent = '0 pts';
+      SFX.playWrong();
     }
-
-
 
     yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';
     feedbackOverlay.classList.add('show');
-
     setTimeout(() => feedbackOverlay.classList.remove('show'), 2000);
   }, 300);
-
-  if (data.correct) {
-    SFX.playCorrect();
-  } else {
-    SFX.playWrong();
-  }
 });
 
 
