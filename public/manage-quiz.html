@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Quizzes — BDCAHOOT</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="window.location.href='/'">BDC<span>AH</span>OOT</div>
+    <div class="navbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='/host.html'">← Host</button>
+      <button class="btn btn-primary btn-sm" onclick="window.location.href='/create-quiz.html'">+ New Quiz</button>
+    </div>
+  </nav>
+
+  <div style="max-width:780px;margin:0 auto;padding:100px 20px 60px;">
+
+    <div style="margin-bottom:32px;">
+      <h1 style="font-size:32px;margin-bottom:8px;">My Quizzes</h1>
+      <p class="text-muted">Manage, edit, or delete your saved quizzes</p>
+    </div>
+
+    <div id="quizList">
+      <div style="text-align:center;padding:60px 0;color:var(--text-muted);">
+        Loading quizzes...
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/manageQuiz.js"></script>
+</body>
+</html>

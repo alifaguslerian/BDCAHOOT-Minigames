@@ -1,73 +1,43 @@
-const fs = require('fs');
-const path = require('path');
+const { pool } = require('./db');
 const { generateQuizId } = require('./utils');
 
-const QUIZZES_PATH = path.join(__dirname, '../data/quizzes.json');
-
-/**
- * Load all quizzes from JSON file
- */
-function loadQuizzes() {
-  try {
-    const raw = fs.readFileSync(QUIZZES_PATH, 'utf8');
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error('[QuizManager] Error loading quizzes:', err.message);
-    return [];
-  }
+async function loadQuizzes() {
+  const res = await pool.query('SELECT id, title, questions, created_at FROM quizzes ORDER BY created_at DESC');
+  return res.rows.map(r => ({
+    id: r.id,
+    title: r.title,
+    questions: r.questions,
+    createdAt: r.created_at
+  }));
 }
 
-/**
- * Save quizzes array back to JSON file
- */
-function saveQuizzes(quizzes) {
-  try {
-    fs.writeFileSync(QUIZZES_PATH, JSON.stringify(quizzes, null, 2), 'utf8');
-    return true;
-  } catch (err) {
-    console.error('[QuizManager] Error saving quizzes:', err.message);
-    return false;
-  }
+async function getQuizById(id) {
+  const res = await pool.query('SELECT * FROM quizzes WHERE id = $1', [id]);
+  if (!res.rows.length) return null;
+  const r = res.rows[0];
+  return { id: r.id, title: r.title, questions: r.questions };
 }
 
-/**
- * Get a specific quiz by ID
- */
-function getQuizById(id) {
-  const quizzes = loadQuizzes();
-  return quizzes.find(q => q.id === id) || null;
+async function createQuiz(title, questions) {
+  const id = generateQuizId();
+  await pool.query(
+    'INSERT INTO quizzes (id, title, questions) VALUES ($1, $2, $3)',
+    [id, title, JSON.stringify(questions)]
+  );
+  return { id, title, questions };
 }
 
-/**
- * Create a new quiz and persist it
- */
-function createQuiz(title, questions) {
-  const quizzes = loadQuizzes();
-  const newQuiz = {
-    id: generateQuizId(),
-    title,
-    questions,
-    createdAt: new Date().toISOString()
-  };
-  quizzes.push(newQuiz);
-  saveQuizzes(quizzes);
-  return newQuiz;
+async function updateQuiz(id, title, questions) {
+  const res = await pool.query(
+    'UPDATE quizzes SET title = $1, questions = $2 WHERE id = $3 RETURNING id',
+    [title, JSON.stringify(questions), id]
+  );
+  return res.rows.length > 0;
 }
 
-/**
- * Delete a quiz by ID
- */
-function deleteQuiz(id) {
-  const quizzes = loadQuizzes();
-  const filtered = quizzes.filter(q => q.id !== id);
-  if (filtered.length === quizzes.length) return false; // not found
-  saveQuizzes(filtered);
-  return true;
+async function deleteQuiz(id) {
+  const res = await pool.query('DELETE FROM quizzes WHERE id = $1 RETURNING id', [id]);
+  return res.rows.length > 0;
 }
 
-module.exports = {
-  loadQuizzes,
-  getQuizById,
-  createQuiz,
-  deleteQuiz
-};
+module.exports = { loadQuizzes, getQuizById, createQuiz, updateQuiz, deleteQuiz };

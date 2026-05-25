@@ -1,5 +1,26 @@
 // createQuiz.js — Dynamic quiz builder
 
+// Cek apakah mode edit
+const urlParams = new URLSearchParams(window.location.search);
+const editId    = urlParams.get('edit');
+
+// Load quiz kalau edit mode
+if (editId) {
+  document.querySelector('.create-header h1').textContent = 'Edit Quiz';
+  document.querySelector('.create-header p').textContent  = 'Update your quiz questions and save';
+  saveQuizBtn.textContent = 'Save Changes ✓';
+
+  fetch(`/api/quizzes/${editId}`)
+    .then(r => r.json())
+    .then(quiz => {
+      quizTitleInput.value = quiz.title;
+      // Clear default blank question
+      questionsContainer.innerHTML = '';
+      questionCount = 0;
+      quiz.questions.forEach(q => addQuestion(q));
+    });
+}
+
 const questionsContainer = document.getElementById('questionsContainer');
 const addQuestionBtn     = document.getElementById('addQuestionBtn');
 const saveQuizBtn        = document.getElementById('saveQuizBtn');
@@ -122,7 +143,6 @@ saveQuizBtn.addEventListener('click', async () => {
   saveSuccess.style.display = 'none';
 
   const { valid, title, questions, errors } = collectQuizData();
-
   if (!valid) {
     saveError.textContent = errors[0];
     saveError.classList.add('show');
@@ -133,25 +153,28 @@ saveQuizBtn.addEventListener('click', async () => {
   saveQuizBtn.textContent = 'Saving...';
 
   try {
-    const res = await fetch('/api/quizzes', {
-      method: 'POST',
+    const url    = editId ? `/api/quizzes/${editId}` : '/api/quizzes';
+    const method = editId ? 'PUT' : 'POST';
+
+    const res  = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, questions })
     });
-
     const data = await res.json();
 
-    if (data.success) {
+    if (data.success || data.quiz) {
       saveSuccess.style.display = 'block';
-      setTimeout(() => window.location.href = '/host.html', 1500);
+      saveSuccess.textContent   = editId ? '✓ Quiz updated! Redirecting...' : '✓ Quiz saved! Redirecting...';
+      setTimeout(() => window.location.href = '/manage-quiz.html', 1500);
     } else {
       throw new Error('Save failed');
     }
   } catch (e) {
-    saveError.textContent = 'Failed to save quiz. Check your connection.';
+    saveError.textContent = 'Failed to save. Check your connection.';
     saveError.classList.add('show');
     saveQuizBtn.disabled = false;
-    saveQuizBtn.textContent = 'Save Quiz ✓';
+    saveQuizBtn.textContent = editId ? 'Save Changes ✓' : 'Save Quiz ✓';
   }
 });
 

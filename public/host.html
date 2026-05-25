@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Host — BDCAHOOT</title>
   <link rel="stylesheet" href="/css/style.css" />
 </head>
+
 <body>
 
   <nav class="navbar">
     <div class="navbar-brand" onclick="window.location.href='/'">BDC<span>AH</span>OOT</div>
     <div class="navbar-actions">
-      <button class="btn btn-ghost btn-sm" onclick="window.location.href='/'">← Home</button>
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='/manage-quiz.html'"> My Quizzes</button>
       <button class="btn btn-primary btn-sm" onclick="window.location.href='/create-quiz.html'">+ Create Quiz</button>
     </div>
   </nav>
@@ -81,8 +83,10 @@
 
         <!-- In-game controls -->
         <div id="gameControls" style="display:none;">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;margin-bottom:20px;">
-            <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px;">
+          <div
+            style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;margin-bottom:20px;">
+            <div
+              style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px;">
               Current Question
             </div>
             <div id="hostQuestionText" style="font-size:22px;font-weight:700;margin-bottom:16px;">—</div>
@@ -103,8 +107,11 @@
         </div>
 
         <!-- Answer reveal (shown between questions) -->
-        <div id="answerRevealArea" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;">
-          <div style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;">Correct Answer</div>
+        <div id="answerRevealArea"
+          style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;">
+          <div
+            style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;">
+            Correct Answer</div>
           <div id="hostCorrectAnswer" style="font-size:20px;font-weight:700;color:var(--green);"></div>
           <div style="margin-top:16px;color:var(--text-secondary);font-size:14px;" id="hostAnswerStats"></div>
         </div>
@@ -129,4 +136,5 @@
   <script src="/js/socket.js"></script>
   <script src="/js/host.js"></script>
 </body>
+
 </html>

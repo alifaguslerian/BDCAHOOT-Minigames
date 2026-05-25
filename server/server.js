@@ -1,3 +1,4 @@
+const { initDB } = require('./db');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -22,27 +23,59 @@ app.use(express.json());
 // REST API ROUTES
 // =====================
 
-// Get all quizzes (for host to select)
-app.get('/api/quizzes', (req, res) => {
-  const quizzes = quizManager.loadQuizzes();
-  // Return only id + title for listing
-  res.json(quizzes.map(q => ({ id: q.id, title: q.title, questionCount: q.questions.length })));
+app.get('/api/quizzes', async (req, res) => {
+  try {
+    const quizzes = await quizManager.loadQuizzes();
+    res.json(quizzes.map(q => ({
+      id: q.id,
+      title: q.title,
+      questionCount: q.questions.length
+    })));
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to load quizzes' });
+  }
 });
 
-// Create new quiz
-app.post('/api/quizzes', (req, res) => {
+app.post('/api/quizzes', async (req, res) => {
   const { title, questions } = req.body;
   if (!title || !questions || !questions.length) {
     return res.status(400).json({ error: 'Title and questions required' });
   }
-  const quiz = quizManager.createQuiz(title, questions);
-  res.json({ success: true, quiz });
+  try {
+    const quiz = await quizManager.createQuiz(title, questions);
+    res.json({ success: true, quiz });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to save quiz' });
+  }
 });
 
-// Delete quiz
-app.delete('/api/quizzes/:id', (req, res) => {
-  const deleted = quizManager.deleteQuiz(req.params.id);
-  res.json({ success: deleted });
+app.put('/api/quizzes/:id', async (req, res) => {
+  const { title, questions } = req.body;
+  try {
+    const updated = await quizManager.updateQuiz(req.params.id, title, questions);
+    res.json({ success: updated });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to update quiz' });
+  }
+});
+
+app.delete('/api/quizzes/:id', async (req, res) => {
+  try {
+    const deleted = await quizManager.deleteQuiz(req.params.id);
+    res.json({ success: deleted });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to delete quiz' });
+  }
+});
+
+app.get('/api/quizzes/:id', async (req, res) => {
+  try {
+    const quiz = await quizManager.getQuizById(req.params.id);
+    if (!quiz) return res.status(404).json({ error: 'Not found' });
+    res.json(quiz);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to load quiz' });
+  }
 });
 
 // =====================
@@ -53,12 +86,12 @@ io.on('connection', (socket) => {
   console.log(`[Socket] Connected: ${socket.id}`);
 
   // ----- HOST: Create Room -----
-  socket.on('create-room', ({ quizId }) => {
-    const quiz = quizManager.getQuizById(quizId);
-    if (!quiz) {
-      socket.emit('error', { message: 'Quiz not found' });
-      return;
-    }
+  socket.on('create-room', async ({ quizId }) => {
+  const quiz = await quizManager.getQuizById(quizId);
+  if (!quiz) {
+    socket.emit('error', { message: 'Quiz not found' });
+    return;
+  }
 
     // Generate unique room code
     let code;
@@ -284,7 +317,12 @@ function endGame(room) {
 // =====================
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`🎮 BDCAHOOT server running on port ${PORT}`);
-  console.log(`👉 http://localhost:${PORT}`);
+initDB().then(() => {
+  server.listen(PORT, () => {
+    console.log(`🎮 BDCAHOOT server running on port ${PORT}`);
+    console.log(`👉 http://localhost:${PORT}`);
+  });
+}).catch(err => {
+  console.error('[DB] Failed to init:', err);
+  process.exit(1);
 });
