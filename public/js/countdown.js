@@ -1,5 +1,3 @@
-// countdown.js — 3-2-1-GO! overlay sebelum soal pertama
-
 const COLORS = { 3: '#FF5252', 2: '#FFD600', 1: '#00E676', 0: '#00D4FF' };
 const SUBS   = { 3: 'Get ready...', 2: 'Almost time!', 1: 'Here we go!', 0: '' };
 
@@ -9,7 +7,7 @@ const cdSub    = document.getElementById('cdSub');
 const cdRing   = document.getElementById('cdRingProg');
 const cdRipple = document.getElementById('cdRipple');
 
-let cdTimer = null;
+let cdTimer   = null;
 let cdCurrent = 3;
 
 function setRingProgress(fraction) {
@@ -45,14 +43,17 @@ function showStep(n) {
   cdNumber.classList.add('pop');
   fireRipple(color);
 
-  if (n === 0) {
-    SFX.playGo();
-  } else {
-    SFX.playCountdown();
+  // Sound — wrapped in try/catch biar tidak crash kalau AudioContext belum ready
+  try {
+    if (n === 0) {
+      SFX.playGo();
+    } else {
+      SFX.playCountdown();
+    }
+  } catch(e) {
+    // AudioContext belum ready, skip sound
   }
-
 }
-
 
 window.startCountdown = function(onComplete) {
   overlay.classList.add('active');
@@ -73,6 +74,7 @@ window.startCountdown = function(onComplete) {
 
       if (cdCurrent < 0) {
         clearInterval(cdTimer);
+        cdTimer = null;
         overlay.classList.remove('active');
         if (onComplete) onComplete();
         return;

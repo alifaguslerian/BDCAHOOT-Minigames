@@ -148,22 +148,16 @@
   </div>
 
   <!-- FEEDBACK OVERLAY -->
+  <!-- FEEDBACK OVERLAY -->
   <div class="feedback-overlay" id="feedbackOverlay">
     <div class="feedback-icon" id="feedbackIcon">✅</div>
     <div class="feedback-label" id="feedbackLabel">Correct!</div>
     <div class="feedback-pts" id="feedbackPts">+1000 pts</div>
   </div>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/socket.js"></script>
-  <script src="/js/sounds.js"></script>
-  <script src="/js/countdown.js"></script>
-  <script src="/js/player.js"></script>
-
   <!-- COUNTDOWN OVERLAY -->
   <div class="countdown-overlay" id="countdownOverlay">
     <div class="cd-label">Game starting in</div>
-
     <div style="position:relative;width:260px;height:260px;display:flex;align-items:center;justify-content:center;">
       <div class="cd-ring-wrap">
         <svg class="cd-svg-ring" viewBox="0 0 260 260">
@@ -174,9 +168,15 @@
       </div>
       <div class="cd-number" id="cdNumber">3</div>
     </div>
-
     <div class="cd-sub" id="cdSub">Get ready...</div>
   </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/socket.js"></script>
+  <script src="/js/sounds.js"></script>
+  <script src="/js/countdown.js"></script>
+  <script src="/js/player.js"></script>
+
 </body>
 
 </html>
