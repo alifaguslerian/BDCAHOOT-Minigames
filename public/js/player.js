@@ -107,6 +107,9 @@ window.socket.on('timer-update', (data) => {
   if (timeLeft <= 0 && !hasAnswered) {
     lockAnswers();
   }
+  if (data.timeLeft <= 5 && data.timeLeft > 0) {
+    SFX.playTimerUrgent();
+  }
 });
 
 // ---- Submit answer ----
@@ -133,10 +136,10 @@ function lockAnswers(selectedBtn = null) {
 // Konfirmasi jawaban diterima — lock UI tapi belum kasih tau benar/salah
 window.socket.on('answer-received', () => {
   // Tampilkan state "menunggu"
-  feedbackIcon.textContent  = '⏳';
+  feedbackIcon.textContent = '⏳';
   feedbackLabel.textContent = 'Answered!';
   feedbackLabel.style.color = 'var(--cyan)';
-  feedbackPts.textContent   = 'Waiting for timer...';
+  feedbackPts.textContent = 'Waiting for timer...';
   feedbackOverlay.classList.add('show');
 });
 
@@ -147,23 +150,32 @@ window.socket.on('answer-result', (data) => {
 
   setTimeout(() => {
     if (data.correct) {
-      feedbackIcon.textContent  = '✅';
+      feedbackIcon.textContent = '✅';
       feedbackLabel.textContent = 'Correct!';
       feedbackLabel.style.color = 'var(--green)';
-      feedbackPts.textContent   = `+${data.score.toLocaleString()} pts`;
+      feedbackPts.textContent = `+${data.score.toLocaleString()} pts`;
     } else {
-      feedbackIcon.textContent  = '❌';
+      feedbackIcon.textContent = '❌';
       feedbackLabel.textContent = 'Wrong!';
       feedbackLabel.style.color = '#FF5252';
-      feedbackPts.textContent   = '0 pts';
+      feedbackPts.textContent = '0 pts';
     }
+
+
 
     yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';
     feedbackOverlay.classList.add('show');
 
     setTimeout(() => feedbackOverlay.classList.remove('show'), 2000);
   }, 300);
+
+  if (data.correct) {
+    SFX.playCorrect();
+  } else {
+    SFX.playWrong();
+  }
 });
+
 
 // ---- Answer reveal (correct answer shown) ----
 window.socket.on('answer-reveal', (data) => {
@@ -175,7 +187,7 @@ window.socket.on('answer-reveal', (data) => {
   btns.forEach((btn, i) => {
     btn.disabled = true;
     const count = distribution[i] || 0;
-    const pct   = Math.round((count / total) * 100);
+    const pct = Math.round((count / total) * 100);
 
     if (i === correctIdx) {
       btn.classList.add('correct');

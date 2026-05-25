@@ -44,7 +44,15 @@ function showStep(n) {
 
   cdNumber.classList.add('pop');
   fireRipple(color);
+
+  if (n === 0) {
+    SFX.playGo();
+  } else {
+    SFX.playCountdown();
+  }
+
 }
+
 
 window.startCountdown = function(onComplete) {
   overlay.classList.add('active');
