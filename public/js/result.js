@@ -1,8 +1,8 @@
 const leaderboard = JSON.parse(sessionStorage.getItem('finalLeaderboard') || '[]');
-const myName      = sessionStorage.getItem('playerName') || '';
+const myName = sessionStorage.getItem('playerName') || '';
 
 const podiumContainer = document.getElementById('podiumContainer');
-const top10List       = document.getElementById('top10List');
+const top10List = document.getElementById('top10List');
 
 if (!leaderboard.length) window.location.href = '/';
 
@@ -23,8 +23,8 @@ const top3 = leaderboard.slice(0, 3);
 while (top3.length < 3) top3.push(null);
 
 const displayOrder = [top3[1], top3[0], top3[2]];
-const rankClasses  = ['rank-2', 'rank-1', 'rank-3'];
-const medals       = ['🥈', '🏆', '🥉'];
+const rankClasses = ['rank-2', 'rank-1', 'rank-3'];
+const medals = ['🥈', '🏆', '🥉'];
 
 podiumContainer.innerHTML = displayOrder.map((player, i) => {
   if (!player) return `<div class="podium-player ${rankClasses[i]}"><div class="podium-stand"></div></div>`;

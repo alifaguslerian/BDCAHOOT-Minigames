@@ -1,6 +1,6 @@
 const { getPool } = require('./db');
 const { generateQuizId } = require('./utils');
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 const JSON_PATH = path.join(__dirname, '../data/quizzes.json');

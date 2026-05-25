@@ -260,9 +260,9 @@ function revealAndLeaderboard(room) {
   }
 
   const question = room.quiz.questions[room.currentQuestionIndex];
-  room.state = 'reviewing';
+  room.state = 'reviewing'; // set SEKARANG, sebelum setTimeout apapun
 
-  // Hitung distribusi jawaban
+  // Hitung distribusi
   const distribution = [0, 0, 0, 0];
   for (const [, player] of room.players) {
     if (player.lastAnswer !== undefined && player.lastAnswer !== null) {
@@ -270,25 +270,22 @@ function revealAndLeaderboard(room) {
     }
   }
 
-  // Step 1: kirim answer-result ke tiap player dulu
-  for (const [socketId, player] of room.players) {
-    const playerSocket = io.sockets.sockets.get(socketId);
-    if (!playerSocket) continue;
+  const leaderboard = gameLogic.getLeaderboard(room);
 
+  // Kirim answer-result ke tiap player pakai io.to(socketId)
+  for (const [socketId, player] of room.players) {
     const result = player.pendingResult || {
       correct: false,
       correctAnswer: question.correctAnswer,
       score: 0,
       totalScore: player.score
     };
-
-    playerSocket.emit('answer-result', result);
+    io.to(socketId).emit('answer-result', result);
     player.pendingResult = null;
-    player.lastAnswer    = null;
+    player.lastAnswer = null;
   }
 
-  // Step 2: kirim round-end setelah 2.5 detik (biar popup sempat keliatan)
-  const leaderboard = gameLogic.getLeaderboard(room);
+  // Kirim round-end setelah 2.5 detik — state sudah 'reviewing' dari atas
   setTimeout(() => {
     io.to(room.code).emit('round-end', {
       correctAnswer: question.correctAnswer,
@@ -296,7 +293,7 @@ function revealAndLeaderboard(room) {
       totalPlayers: room.players.size,
       leaderboard
     });
-  }, 2500);
+  }, 2);
 }
 /**
  * End the game and send final results

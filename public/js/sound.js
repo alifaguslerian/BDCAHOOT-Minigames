@@ -5,9 +5,9 @@ let ctx = null;
 
 // Lazy init — browser butuh user interaction dulu sebelum AudioContext bisa jalan
 function getCtx() {
-  if (!ctx) ctx = new AudioCtx();
-  if (ctx.state === 'suspended') ctx.resume();
-  return ctx;
+    if (!ctx) ctx = new AudioCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
 }
 
 function playCorrect() {
@@ -118,5 +118,5 @@ window.SFX = { playCorrect, playWrong, playCountdown, playGo, playTimerUrgent };
 
 // Unlock AudioContext on first user interaction
 document.addEventListener('click', () => {
-  if (ctx && ctx.state === 'suspended') ctx.resume();
+    if (ctx && ctx.state === 'suspended') ctx.resume();
 }, { once: false });
