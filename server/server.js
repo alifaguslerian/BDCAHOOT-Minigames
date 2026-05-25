@@ -87,11 +87,11 @@ io.on('connection', (socket) => {
 
   // ----- HOST: Create Room -----
   socket.on('create-room', async ({ quizId }) => {
-  const quiz = await quizManager.getQuizById(quizId);
-  if (!quiz) {
-    socket.emit('error', { message: 'Quiz not found' });
-    return;
-  }
+    const quiz = await quizManager.getQuizById(quizId);
+    if (!quiz) {
+      socket.emit('error', { message: 'Quiz not found' });
+      return;
+    }
 
     // Generate unique room code
     let code;
@@ -173,12 +173,8 @@ io.on('connection', (socket) => {
     const result = gameLogic.submitAnswer(room, socket.id, answerIndex);
     if (!result) return;
 
-    // Jangan kirim result sekarang — simpan dulu, kirim pas timer habis
-    // Cukup konfirmasi bahwa jawaban sudah diterima
+    // Hanya konfirmasi diterima, belum kasih tau bener/salah
     socket.emit('answer-received');
-
-    // Hapus auto-reveal kalau semua sudah jawab
-    // Biarkan timer yang jadi penentu
   });
 
   // ----- HOST: End Game -----
@@ -274,34 +270,33 @@ function revealAndLeaderboard(room) {
     }
   }
 
-  // Kirim result ke masing-masing player (benar/salah + poin)
+  // Kirim result ke masing-masing player
   for (const [socketId, player] of room.players) {
     const playerSocket = io.sockets.sockets.get(socketId);
-    if (playerSocket && player.pendingResult) {
-      playerSocket.emit('answer-result', player.pendingResult);
-      player.pendingResult = null;
-    } else if (playerSocket) {
-      // Player tidak jawab
-      playerSocket.emit('answer-result', {
-        correct: false,
-        correctAnswer: question.correctAnswer,
-        score: 0,
-        totalScore: player.score
-      });
-    }
+    if (!playerSocket) continue;
+
+    const result = player.pendingResult || {
+      correct: false,
+      correctAnswer: question.correctAnswer,
+      score: 0,
+      totalScore: player.score
+    };
+
+    playerSocket.emit('answer-result', result);
+    player.pendingResult = null;
+    player.lastAnswer = null;
   }
 
-  // Broadcast reveal + distribusi ke semua
-  io.to(room.code).emit('answer-reveal', {
+  // Broadcast distribusi + leaderboard ke semua
+  const leaderboard = gameLogic.getLeaderboard(room);
+
+  io.to(room.code).emit('round-end', {
     correctAnswer: question.correctAnswer,
     distribution,
-    totalPlayers: room.players.size
+    totalPlayers: room.players.size,
+    leaderboard
   });
-
-  const leaderboard = gameLogic.getLeaderboard(room);
-  io.to(room.code).emit('leaderboard-updated', { leaderboard });
 }
-
 /**
  * End the game and send final results
  */

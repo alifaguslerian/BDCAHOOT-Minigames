@@ -135,9 +135,8 @@ function lockAnswers(selectedBtn = null) {
   });
 }
 
-// Konfirmasi jawaban diterima — lock UI tapi belum kasih tau benar/salah
+// Jawaban diterima server — tampilkan waiting state
 window.socket.on('answer-received', () => {
-  // Tampilkan state "menunggu"
   feedbackIcon.textContent = '⏳';
   feedbackLabel.textContent = 'Answered!';
   feedbackLabel.style.color = 'var(--cyan)';
@@ -146,8 +145,9 @@ window.socket.on('answer-received', () => {
 });
 
 // ---- Answer result ----
-// Timer habis — sekarang baru kasih tau hasilnya
+// Timer habis — tampilkan hasil + leaderboard
 window.socket.on('answer-result', (data) => {
+  // Update feedback overlay dengan hasil
   feedbackOverlay.classList.remove('show');
 
   setTimeout(() => {
@@ -167,24 +167,22 @@ window.socket.on('answer-result', (data) => {
 
     yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';
     feedbackOverlay.classList.add('show');
+
+    // Auto hide setelah 2 detik
     setTimeout(() => feedbackOverlay.classList.remove('show'), 2000);
   }, 300);
 });
 
-
-// ---- Answer reveal (correct answer shown) ----
-window.socket.on('answer-reveal', (data) => {
-  const correctIdx = data.correctAnswer;
-  const distribution = data.distribution || [0, 0, 0, 0];
-  const total = data.totalPlayers || 1;
-
+// Round end — update leaderboard + distribusi jawaban
+window.socket.on('round-end', (data) => {
+  // Update answer buttons dengan distribusi
   const btns = answersGrid.querySelectorAll('.answer-btn');
   btns.forEach((btn, i) => {
     btn.disabled = true;
-    const count = distribution[i] || 0;
-    const pct = Math.round((count / total) * 100);
+    const count = data.distribution[i] || 0;
+    const pct = Math.round((count / data.totalPlayers) * 100);
 
-    if (i === correctIdx) {
+    if (i === data.correctAnswer) {
       btn.classList.add('correct');
       btn.style.opacity = '1';
     } else {
@@ -192,20 +190,22 @@ window.socket.on('answer-reveal', (data) => {
       btn.style.opacity = '0.5';
     }
 
-    // Tambah bar distribusi di dalam button
-    btn.innerHTML = `
-      <div class="answer-icon">${btn.querySelector('.answer-icon').innerHTML}</div>
-      <span class="answer-text">${btn.querySelector('.answer-text').textContent}</span>
-      <div class="answer-dist">
-        <div class="answer-dist-bar" style="width:${pct}%"></div>
-        <span class="answer-dist-label">${count}</span>
-      </div>
-    `;
+    // Tambah bar distribusi
+    const textEl = btn.querySelector('.answer-text');
+    const iconEl = btn.querySelector('.answer-icon');
+    if (textEl && iconEl) {
+      btn.innerHTML = `
+        <div class="answer-icon">${iconEl.innerHTML}</div>
+        <span class="answer-text">${textEl.textContent}</span>
+        <div class="answer-dist">
+          <div class="answer-dist-bar" style="width:${pct}%"></div>
+          <span class="answer-dist-label">${count}</span>
+        </div>
+      `;
+    }
   });
-});
 
-// ---- Leaderboard update ----
-window.socket.on('leaderboard-updated', (data) => {
+  // Update leaderboard sidebar
   renderLeaderboard(data.leaderboard);
 });
 

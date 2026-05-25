@@ -132,20 +132,68 @@ window.socket.on('player-list-updated', (data) => {
     }
   });
 
-  // ---- Answer reveal ----
-  window.socket.on('answer-reveal', (data) => {
-    nextQuestionBtn.disabled = false;
-    answerRevealArea.style.display = 'block';
+  // Timer habis — tampilkan hasil + leaderboard
+  window.socket.on('answer-result', (data) => {
+    // Update feedback overlay dengan hasil
+    feedbackOverlay.classList.remove('show');
 
-    const correctIdx = data.correctAnswer;
-    const answeredCount = currentPlayers.filter(p => p.answered).length;
-    hostCorrectAnswer.textContent = `Option ${correctIdx + 1}`;
-    hostAnswerStats.textContent = `${answeredCount} / ${playerCount} players answered`;
+    setTimeout(() => {
+      if (data.correct) {
+        feedbackIcon.textContent = '✅';
+        feedbackLabel.textContent = 'Correct!';
+        feedbackLabel.style.color = 'var(--green)';
+        feedbackPts.textContent = `+${data.score.toLocaleString()} pts`;
+        SFX.playCorrect();
+      } else {
+        feedbackIcon.textContent = '❌';
+        feedbackLabel.textContent = 'Wrong!';
+        feedbackLabel.style.color = '#FF5252';
+        feedbackPts.textContent = '0 pts';
+        SFX.playWrong();
+      }
+
+      yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';
+      feedbackOverlay.classList.add('show');
+
+      // Auto hide setelah 2 detik
+      setTimeout(() => feedbackOverlay.classList.remove('show'), 2000);
+    }, 300);
   });
 
-  // ---- Leaderboard update ----
-  window.socket.on('leaderboard-updated', (data) => {
-    renderHostLeaderboard(data.leaderboard);
+  // Round end — update leaderboard + distribusi jawaban
+  window.socket.on('round-end', (data) => {
+    // Update answer buttons dengan distribusi
+    const btns = answersGrid.querySelectorAll('.answer-btn');
+    btns.forEach((btn, i) => {
+      btn.disabled = true;
+      const count = data.distribution[i] || 0;
+      const pct = Math.round((count / data.totalPlayers) * 100);
+
+      if (i === data.correctAnswer) {
+        btn.classList.add('correct');
+        btn.style.opacity = '1';
+      } else {
+        btn.classList.add('wrong');
+        btn.style.opacity = '0.5';
+      }
+
+      // Tambah bar distribusi
+      const textEl = btn.querySelector('.answer-text');
+      const iconEl = btn.querySelector('.answer-icon');
+      if (textEl && iconEl) {
+        btn.innerHTML = `
+        <div class="answer-icon">${iconEl.innerHTML}</div>
+        <span class="answer-text">${textEl.textContent}</span>
+        <div class="answer-dist">
+          <div class="answer-dist-bar" style="width:${pct}%"></div>
+          <span class="answer-dist-label">${count}</span>
+        </div>
+      `;
+      }
+    });
+
+    // Update leaderboard sidebar
+    renderLeaderboard(data.leaderboard);
   });
 
   // Leaderboard di host — ganti renderHostLeaderboard:

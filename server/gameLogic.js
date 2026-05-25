@@ -60,18 +60,18 @@ function submitAnswer(room, socketId, answerIndex) {
   const isCorrect = answerIndex === question.correctAnswer;
 
   room.answeredThisRound.add(socketId);
-  player.answered = true;
-  player.lastAnswer = answerIndex; // simpan jawaban untuk distribusi
+  player.answered   = true;
+  player.lastAnswer = answerIndex;
 
   let earned = 0;
   if (isCorrect) {
-    const elapsed = (Date.now() - room.questionStartTime) / 1000;
+    const elapsed       = (Date.now() - room.questionStartTime) / 1000;
     const timeRemaining = Math.max(0, question.timeLimit - elapsed);
     earned = calculateScore(question.timeLimit, timeRemaining);
     player.score += earned;
   }
 
-  // Simpan result, kirim nanti pas timer habis
+  // Simpan, kirim nanti pas timer habis
   player.pendingResult = {
     correct: isCorrect,
     correctAnswer: question.correctAnswer,
