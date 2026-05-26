@@ -107,14 +107,10 @@ window.socket.on('timer-update', (data) => {
   if (timeLeft <= 0 && !hasAnswered) {
     lockAnswers();
   }
-  if (data.timeLeft <= 5 && data.timeLeft > 0) {
-    SFX.playTimerUrgent();
-  }
 });
 
 // ---- Submit answer ----
 answersGrid.addEventListener('click', (e) => {
-  if (window.SFX) getCtx && SFX.playCorrect && getCtx();
 
   const btn = e.target.closest('.answer-btn');
   if (!btn || hasAnswered) return;
@@ -155,13 +151,11 @@ window.socket.on('answer-result', (data) => {
       feedbackLabel.textContent = 'Jawaban benar!';
       feedbackLabel.style.color = 'var(--green)';
       feedbackPts.textContent   = `Dapat +${data.score.toLocaleString()} poin`;
-      SFX.playCorrect();
     } else {
       feedbackIcon.textContent  = '❌';
       feedbackLabel.textContent = 'Jawaban salah';
       feedbackLabel.style.color = '#FF5252';
       feedbackPts.textContent   = 'Dapat 0 poin';
-      SFX.playWrong();
     }
 
     yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';

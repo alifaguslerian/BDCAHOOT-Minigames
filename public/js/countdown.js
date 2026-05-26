@@ -43,16 +43,6 @@ function showStep(n) {
   cdNumber.classList.add('pop');
   fireRipple(color);
 
-  // Sound — wrapped in try/catch biar tidak crash kalau AudioContext belum ready
-  try {
-    if (n === 0) {
-      SFX.playGo();
-    } else {
-      SFX.playCountdown();
-    }
-  } catch(e) {
-    // AudioContext belum ready, skip sound
-  }
 }
 
 window.startCountdown = function(onComplete) {
