@@ -293,7 +293,7 @@ function revealAndLeaderboard(room) {
       totalPlayers: room.players.size,
       leaderboard
     });
-  }, 2);
+  }, 2500);
 }
 /**
  * End the game and send final results

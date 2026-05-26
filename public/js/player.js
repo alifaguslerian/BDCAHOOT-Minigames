@@ -152,15 +152,15 @@ window.socket.on('answer-result', (data) => {
   setTimeout(() => {
     if (data.correct) {
       feedbackIcon.textContent  = '✅';
-      feedbackLabel.textContent = 'Correct!';
+      feedbackLabel.textContent = 'Jawaban benar!';
       feedbackLabel.style.color = 'var(--green)';
-      feedbackPts.textContent   = `+${data.score.toLocaleString()} pts`;
+      feedbackPts.textContent   = `Dapat +${data.score.toLocaleString()} poin`;
       SFX.playCorrect();
     } else {
       feedbackIcon.textContent  = '❌';
-      feedbackLabel.textContent = 'Wrong!';
+      feedbackLabel.textContent = 'Jawaban salah';
       feedbackLabel.style.color = '#FF5252';
-      feedbackPts.textContent   = '0 pts';
+      feedbackPts.textContent   = 'Dapat 0 poin';
       SFX.playWrong();
     }
 
@@ -173,7 +173,11 @@ window.socket.on('answer-result', (data) => {
 
 // Round end — update leaderboard + distribusi jawaban
 window.socket.on('round-end', (data) => {
-  feedbackOverlay.classList.remove('show');
+  // Keep answer-result popup visible briefly so the player can read it
+  setTimeout(() => {
+    feedbackOverlay.classList.remove('show');
+  }, 1800);
+
   // Update answer buttons dengan distribusi
   const btns = answersGrid.querySelectorAll('.answer-btn');
   btns.forEach((btn, i) => {
