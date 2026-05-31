@@ -2,7 +2,6 @@
 
 const lobbyScreen = document.getElementById('lobbyScreen');
 const gameScreen = document.getElementById('gameScreen');
-const lobbyCodeDisplay = document.getElementById('lobbyCodeDisplay');
 const playerNameDisplay = document.getElementById('playerNameDisplay');
 const quizTitleDisplay = document.getElementById('quizTitleDisplay');
 const qProgressDisplay = document.getElementById('qProgressDisplay');
@@ -28,7 +27,6 @@ const quizTitle = sessionStorage.getItem('quizTitle') || 'Quiz';
 if (!roomCode) window.location.href = '/';
 
 // Set lobby info
-lobbyCodeDisplay.textContent = roomCode;
 playerNameDisplay.textContent = playerName;
 quizTitleDisplay.textContent = quizTitle;
 yourRankName.textContent = playerName;
