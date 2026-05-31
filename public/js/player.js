@@ -65,7 +65,11 @@ window.socket.on('player-list-updated', (data) => {
 window.socket.on('game-started', () => {
   lobbyScreen.style.display = 'none';
   gameScreen.style.display = 'grid';
-  startCountdown(); // countdown sebelum soal pertama
+
+  // Kalau gameScreen sudah visible (reconnect), skip countdown
+  if (gameScreen.dataset.started) return;
+  gameScreen.dataset.started = 'true';
+  startCountdown();
 });
 
 // ---- New question ----
