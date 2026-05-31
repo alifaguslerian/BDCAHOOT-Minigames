@@ -1,10 +1,24 @@
 const leaderboard = JSON.parse(sessionStorage.getItem('finalLeaderboard') || '[]');
+const previousLeaderboard = JSON.parse(sessionStorage.getItem('previousLeaderboard') || 'null');
 const myName = sessionStorage.getItem('playerName') || '';
 
 const podiumContainer = document.getElementById('podiumContainer');
 const top10List = document.getElementById('top10List');
 
 if (!leaderboard.length) window.location.href = '/';
+
+// Helper function untuk mendeteksi perubahan ranking
+function getRankChangeAnimation(currentRank, playerName) {
+  if (!previousLeaderboard || !Array.isArray(previousLeaderboard)) return null;
+  
+  const previousPlayer = previousLeaderboard.find(p => p.name === playerName);
+  if (!previousPlayer) return null;
+  
+  const previousRank = previousPlayer.rank;
+  if (currentRank < previousRank) return 'rank-up'; // Ranking naik (angka lebih kecil = lebih baik)
+  if (currentRank > previousRank) return 'rank-down'; // Ranking turun
+  return null;
+}
 
 function avatarFor(player) {
   return player.avatar || player.name.substring(0, 2).toUpperCase();
@@ -53,15 +67,27 @@ const rest = leaderboard.slice(3, 10);
 if (rest.length === 0) {
   top10List.innerHTML = '<p style="color:var(--text-muted);font-size:14px;text-align:center;padding:20px 0;">Only 3 or fewer players</p>';
 } else {
-  top10List.innerHTML = rest.map((player) => {
+  top10List.innerHTML = rest.map((player, index) => {
     const isMe = player.name === myName;
+    const rankChange = getRankChangeAnimation(player.rank, player.name);
+    let animationClass = '';
+    let animationDelay = `${index * 0.08}s`;
+    
+    if (rankChange === 'rank-up') {
+      animationClass = 'animate-rank-up';
+    } else if (rankChange === 'rank-down') {
+      animationClass = 'animate-rank-down';
+    } else {
+      animationClass = 'animate-up';
+    }
+    
     return `
-      <div class="top10-item" style="${isMe ? 'background:rgba(0,212,255,0.08);border-radius:10px;' : ''}">
+      <div class="top10-item ${animationClass}" style="animation-delay:${animationDelay};${isMe ? 'border:1px solid rgba(0,212,255,0.3);' : ''}" data-player-name="${player.name}">
         <div class="top10-rank">${player.rank}</div>
         <div class="top10-badge" style="background:${bgFor(player)};font-size:${fontSize(player)};">
           ${avatarFor(player)}
         </div>
-        <div class="top10-name">${player.name}${isMe ? ' (You)' : ''}</div>
+        <div class="top10-name">${player.name}${isMe ? ' 🎯' : ''}</div>
         <div class="top10-pts">${player.score.toLocaleString()}</div>
       </div>
     `;

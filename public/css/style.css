@@ -1349,11 +1349,17 @@ footer {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 14px 0;
+  padding: 14px 12px;
   border-bottom: 1px solid var(--border);
+  margin: 0 -12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
 .top10-item:last-child {
   border-bottom: none;
+}
+.top10-item[data-player-name] {
+  position: relative;
 }
 
 .top10-rank {
@@ -1603,12 +1609,76 @@ footer {
   }
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rankUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    background: rgba(0, 230, 118, 0.1);
+  }
+  50% {
+    background: rgba(0, 230, 118, 0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    background: transparent;
+  }
+}
+
+@keyframes rankDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+    background: rgba(247, 37, 133, 0.1);
+  }
+  50% {
+    background: rgba(247, 37, 133, 0.15);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    background: transparent;
+  }
+}
+
+@keyframes pulseRank {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+  }
+}
+
 .animate-in {
   animation: fadeIn 0.4s ease forwards;
 }
 
 .animate-up {
   animation: slideUp 0.5s ease forwards;
+}
+
+.animate-rank-up {
+  animation: rankUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+
+.animate-rank-down {
+  animation: rankDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+
+.pulse-rank {
+  animation: pulseRank 0.8s ease-out;
 }
 
 /* =============================================

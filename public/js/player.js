@@ -222,25 +222,71 @@ window.socket.on('round-end', (data) => {
   renderLeaderboard(data.leaderboard);
 });
 
+let prevRanks = {};
+
 function renderLeaderboard(board) {
   const myAvatar = sessionStorage.getItem('playerAvatar') || '🎮';
   const myAvatarBg = sessionStorage.getItem('playerAvatarBg') || '#1A2A6C';
   const top5 = board.slice(0, 5);
   const myEntry = board.find(p => p.name === playerName);
+  const ROW_H = 52;
 
-  leaderboardList.innerHTML = top5.map((p, i) => {
+  leaderboardList.style.position = 'relative';
+  leaderboardList.style.height = (top5.length * ROW_H) + 'px';
+
+  top5.forEach((p, i) => {
     const isMe = p.name === playerName;
     const emoji = isMe ? myAvatar : (p.avatar || p.name.substring(0, 2).toUpperCase());
     const bg = isMe ? myAvatarBg : (p.avatarBg || '#1A2A6C');
-    return `
-      <div class="lb-item ${i < 3 ? 'top-3' : ''} ${isMe ? 'is-you' : ''}">
-        <div class="lb-rank">${p.rank}</div>
-        <div class="lb-avatar" style="background:${bg};font-size:14px;">${emoji}</div>
-        <div class="lb-name">${p.name}${isMe ? ' (You)' : ''}</div>
-        <div class="lb-score">${p.score.toLocaleString()}</div>
-      </div>
+    const prev = prevRanks[p.name];
+    const moved = prev !== undefined ? prev - p.rank : 0;
+    const arrowIcon = moved > 0 ? '↑' : moved < 0 ? '↓' : '—';
+    const arrowColor = moved > 0 ? '#00E676' : moved < 0 ? '#FF5252' : 'rgba(255,255,255,0.2)';
+    const topClass = p.rank === 1 ? 'top-3' : p.rank <= 3 ? 'top-3' : '';
+
+    let row = document.getElementById('lb-row-' + p.name.replace(/\s/g, '_'));
+
+    if (!row) {
+      row = document.createElement('div');
+      row.id = 'lb-row-' + p.name.replace(/\s/g, '_');
+      row.className = `lb-item ${topClass} ${isMe ? 'is-you' : ''}`;
+      row.style.cssText = `
+        position:absolute;left:0;width:100%;
+        transition:top 0.5s cubic-bezier(0.34,1.4,0.64,1), background 0.3s ease;
+      `;
+      leaderboardList.appendChild(row);
+    }
+
+    // Animasi naik/turun
+    row.style.top = (i * ROW_H) + 'px';
+    row.className = `lb-item ${topClass} ${isMe ? 'is-you' : ''}`;
+
+    // Flash hijau kalau naik rank
+    if (moved > 0) {
+      row.style.background = 'rgba(0,230,118,0.15)';
+      setTimeout(() => { row.style.background = ''; }, 800);
+    } else if (moved < 0) {
+      row.style.background = 'rgba(255,82,82,0.08)';
+      setTimeout(() => { row.style.background = ''; }, 800);
+    }
+
+    row.innerHTML = `
+      <div class="lb-rank">${p.rank}</div>
+      <div class="lb-avatar" style="background:${bg};font-size:14px;">${emoji}</div>
+      <div class="lb-name">${p.name}${isMe ? ' (You)' : ''}</div>
+      <div class="lb-score">${p.score.toLocaleString()}</div>
+      <span style="font-size:11px;font-weight:800;color:${arrowColor};margin-left:2px;min-width:14px;text-align:center;">${arrowIcon}</span>
     `;
-  }).join('');
+  });
+
+  // Hapus row yang sudah tidak di top5
+  const top5Names = top5.map(p => 'lb-row-' + p.name.replace(/\s/g, '_'));
+  leaderboardList.querySelectorAll('.lb-item').forEach(el => {
+    if (!top5Names.includes(el.id)) el.remove();
+  });
+
+  // Update prevRanks
+  board.forEach(p => { prevRanks[p.name] = p.rank; });
 
   if (myEntry) {
     yourRankNum.textContent = '#' + myEntry.rank;
@@ -250,6 +296,11 @@ function renderLeaderboard(board) {
 
 // ---- Game finished ----
 window.socket.on('game-finished', (data) => {
+  // Simpan leaderboard sebelumnya untuk animasi perubahan ranking
+  const currentLeaderboard = sessionStorage.getItem('finalLeaderboard');
+  if (currentLeaderboard) {
+    sessionStorage.setItem('previousLeaderboard', currentLeaderboard);
+  }
   sessionStorage.setItem('finalLeaderboard', JSON.stringify(data.leaderboard));
   sessionStorage.setItem('playerName', playerName);
   window.location.href = '/result.html';
