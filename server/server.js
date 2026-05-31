@@ -114,19 +114,57 @@ io.on('connection', (socket) => {
       socket.emit('join-error', { message: 'Room not found. Check your room code.' });
       return;
     }
-    if (room.state !== 'lobby') {
-      socket.emit('join-error', { message: 'Game already in progress.' });
+
+    // Allow rejoin kalau game sedang berlangsung (reconnect case)
+    if (room.state !== 'lobby' && room.state !== 'question' && room.state !== 'reviewing') {
+      socket.emit('join-error', { message: 'Game already finished.' });
       return;
     }
 
-    const player = roomManager.addPlayer(code, socket.id, playerName, avatar, avatarBg);
-    if (!player) {
+    const result = roomManager.addPlayer(code, socket.id, playerName, avatar, avatarBg);
+    if (!result) {
       socket.emit('join-error', { message: 'Name already taken. Choose another name.' });
       return;
     }
 
+    const { player, isReconnect } = result;
+
     socket.join(code);
-    socket.emit('room-joined', { code, playerName, quizTitle: room.quiz.title });
+    socket.emit('room-joined', {
+      code,
+      playerName,
+      quizTitle: room.quiz.title,
+      isReconnect
+    });
+
+    if (isReconnect && room.state !== 'lobby') {
+      // Kirim state game saat ini biar player bisa nyambung lagi
+      socket.emit('game-started', { totalQuestions: room.quiz.questions.length });
+
+      if (room.state === 'question' || room.state === 'reviewing') {
+        const question = room.quiz.questions[room.currentQuestionIndex];
+        socket.emit('question-started', {
+          questionIndex: room.currentQuestionIndex,
+          totalQuestions: room.quiz.questions.length,
+          question: question.question,
+          options: question.options,
+          timeLimit: question.timeLimit
+        });
+
+        // Kalau lagi reviewing, kirim round-end langsung
+        if (room.state === 'reviewing') {
+          const leaderboard = gameLogic.getLeaderboard(room);
+          socket.emit('round-end', {
+            correctAnswer: question.correctAnswer,
+            distribution: [0, 0, 0, 0],
+            totalPlayers: room.players.size,
+            leaderboard
+          });
+        }
+      }
+
+      console.log(`[Room] ${playerName} reconnected to ${code}`);
+    }
 
     const players = roomManager.getPlayerList(code);
     io.to(code).emit('player-list-updated', {
@@ -190,23 +228,33 @@ io.on('connection', (socket) => {
     if (!room) return;
 
     if (room.hostId === socket.id) {
-      // Host left — end the game
       io.to(room.code).emit('host-left', { message: 'Host disconnected. Game ended.' });
       if (room.questionTimer) clearInterval(room.questionTimer);
       roomManager.deleteRoom(room.code);
       console.log(`[Room] Deleted ${room.code} (host left)`);
     } else {
-      // Player left
       const player = room.players.get(socket.id);
-      roomManager.removePlayer(room.code, socket.id);
+      if (!player) return;
 
-      const players = roomManager.getPlayerList(room.code);
-      io.to(room.code).emit('player-list-updated', {
-        players: players.map(p => ({ name: p.name, score: p.score })),
-        count: players.length
+      console.log(`[Room] ${player.name} disconnected from ${room.code}, waiting 30s...`);
+
+      // Tandai disconnected, jangan hapus dulu
+      roomManager.disconnectPlayer(room.code, socket.id, (removedPlayer) => {
+        // Dipanggil setelah 30 detik kalau tidak reconnect
+        console.log(`[Room] ${removedPlayer.name} removed from ${room.code} (timeout)`);
+        const players = roomManager.getPlayerList(room.code);
+        io.to(room.code).emit('player-list-updated', {
+          players: players.map(p => ({ name: p.name, avatar: p.avatar, avatarBg: p.avatarBg, score: p.score })),
+          count: players.length
+        });
       });
 
-      if (player) console.log(`[Room] ${player.name} left ${room.code}`);
+      // Update player list langsung (filter yang disconnected)
+      const players = roomManager.getPlayerList(room.code);
+      io.to(room.code).emit('player-list-updated', {
+        players: players.map(p => ({ name: p.name, avatar: p.avatar, avatarBg: p.avatarBg, score: p.score })),
+        count: players.length
+      });
     }
   });
 });
@@ -215,107 +263,107 @@ io.on('connection', (socket) => {
 // HELPER FUNCTIONS
 // =====================
 
-/**
- * Send next question to room, start countdown timer
- */
-function sendNextQuestion(room) {
-  // Clear previous timer if any
-  if (room.questionTimer) {
-    clearInterval(room.questionTimer);
-    room.questionTimer = null;
-  }
-
-  const questionData = gameLogic.nextQuestion(room);
-
-  if (!questionData) {
-    // No more questions — end the game
-    endGame(room);
-    return;
-  }
-
-  io.to(room.code).emit('question-started', questionData);
-
-  let timeLeft = questionData.timeLimit;
-
-  // Countdown timer — broadcasts every second
-  room.questionTimer = setInterval(() => {
-    timeLeft--;
-    io.to(room.code).emit('timer-update', { timeLeft });
-
-    if (timeLeft <= 0) {
+  /**
+   * Send next question to room, start countdown timer
+   */
+  function sendNextQuestion(room) {
+    // Clear previous timer if any
+    if (room.questionTimer) {
       clearInterval(room.questionTimer);
       room.questionTimer = null;
-      revealAndLeaderboard(room);
     }
-  }, 1000);
-}
 
-/**
- * Reveal correct answer + send leaderboard update
- */
-function revealAndLeaderboard(room) {
-  if (room.questionTimer) {
-    clearInterval(room.questionTimer);
-    room.questionTimer = null;
-  }
+    const questionData = gameLogic.nextQuestion(room);
 
-  const question = room.quiz.questions[room.currentQuestionIndex];
-  room.state = 'reviewing'; // set SEKARANG, sebelum setTimeout apapun
-
-  // Hitung distribusi
-  const distribution = [0, 0, 0, 0];
-  for (const [, player] of room.players) {
-    if (player.lastAnswer !== undefined && player.lastAnswer !== null) {
-      distribution[player.lastAnswer]++;
+    if (!questionData) {
+      // No more questions — end the game
+      endGame(room);
+      return;
     }
+
+    io.to(room.code).emit('question-started', questionData);
+
+    let timeLeft = questionData.timeLimit;
+
+    // Countdown timer — broadcasts every second
+    room.questionTimer = setInterval(() => {
+      timeLeft--;
+      io.to(room.code).emit('timer-update', { timeLeft });
+
+      if (timeLeft <= 0) {
+        clearInterval(room.questionTimer);
+        room.questionTimer = null;
+        revealAndLeaderboard(room);
+      }
+    }, 1000);
   }
 
-  const leaderboard = gameLogic.getLeaderboard(room);
+  /**
+   * Reveal correct answer + send leaderboard update
+   */
+  function revealAndLeaderboard(room) {
+    if (room.questionTimer) {
+      clearInterval(room.questionTimer);
+      room.questionTimer = null;
+    }
 
-  // Kirim answer-result ke tiap player pakai io.to(socketId)
-  for (const [socketId, player] of room.players) {
-    const result = player.pendingResult || {
-      correct: false,
-      correctAnswer: question.correctAnswer,
-      score: 0,
-      totalScore: player.score
-    };
-    io.to(socketId).emit('answer-result', result);
-    player.pendingResult = null;
-    player.lastAnswer = null;
+    const question = room.quiz.questions[room.currentQuestionIndex];
+    room.state = 'reviewing'; // set SEKARANG, sebelum setTimeout apapun
+
+    // Hitung distribusi
+    const distribution = [0, 0, 0, 0];
+    for (const [, player] of room.players) {
+      if (player.lastAnswer !== undefined && player.lastAnswer !== null) {
+        distribution[player.lastAnswer]++;
+      }
+    }
+
+    const leaderboard = gameLogic.getLeaderboard(room);
+
+    // Kirim answer-result ke tiap player pakai io.to(socketId)
+    for (const [socketId, player] of room.players) {
+      const result = player.pendingResult || {
+        correct: false,
+        correctAnswer: question.correctAnswer,
+        score: 0,
+        totalScore: player.score
+      };
+      io.to(socketId).emit('answer-result', result);
+      player.pendingResult = null;
+      player.lastAnswer = null;
+    }
+
+    // Kirim round-end setelah 2.5 detik — state sudah 'reviewing' dari atas
+    setTimeout(() => {
+      io.to(room.code).emit('round-end', {
+        correctAnswer: question.correctAnswer,
+        distribution,
+        totalPlayers: room.players.size,
+        leaderboard
+      });
+    }, 2500);
+  }
+  /**
+   * End the game and send final results
+   */
+  function endGame(room) {
+    room.state = 'finished';
+    const leaderboard = gameLogic.getLeaderboard(room);
+    io.to(room.code).emit('game-finished', { leaderboard });
+    console.log(`[Game] Finished in room ${room.code}`);
   }
 
-  // Kirim round-end setelah 2.5 detik — state sudah 'reviewing' dari atas
-  setTimeout(() => {
-    io.to(room.code).emit('round-end', {
-      correctAnswer: question.correctAnswer,
-      distribution,
-      totalPlayers: room.players.size,
-      leaderboard
+  // =====================
+  // START SERVER
+  // =====================
+
+  const PORT = process.env.PORT || 3000;
+  initDB().then(() => {
+    server.listen(PORT, () => {
+      console.log(`🎮 BDCAHOOT server running on port ${PORT}`);
+      console.log(`👉 http://localhost:${PORT}`);
     });
-  }, 2500);
-}
-/**
- * End the game and send final results
- */
-function endGame(room) {
-  room.state = 'finished';
-  const leaderboard = gameLogic.getLeaderboard(room);
-  io.to(room.code).emit('game-finished', { leaderboard });
-  console.log(`[Game] Finished in room ${room.code}`);
-}
-
-// =====================
-// START SERVER
-// =====================
-
-const PORT = process.env.PORT || 3000;
-initDB().then(() => {
-  server.listen(PORT, () => {
-    console.log(`🎮 BDCAHOOT server running on port ${PORT}`);
-    console.log(`👉 http://localhost:${PORT}`);
+  }).catch(err => {
+    console.error('[DB] Failed to init:', err);
+    process.exit(1);
   });
-}).catch(err => {
-  console.error('[DB] Failed to init:', err);
-  process.exit(1);
-});

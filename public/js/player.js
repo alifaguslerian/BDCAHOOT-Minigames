@@ -38,10 +38,22 @@ let hasAnswered = false;
 
 // ---- Re-join if socket reconnects ----
 window.socket.on('connect', () => {
-  // Rejoin room on reconnect (handles page refresh)
-  if (roomCode && playerName) {
-    window.socket.emit('join-room', { code: roomCode, playerName });
+  const code = sessionStorage.getItem('roomCode');
+  const name = sessionStorage.getItem('playerName');
+  const avatar = sessionStorage.getItem('playerAvatar');
+  const avatarBg = sessionStorage.getItem('playerAvatarBg');
+
+  if (code && name) {
+    window.socket.emit('join-room', { code, playerName: name, avatar, avatarBg });
   }
+});
+
+window.socket.on('room-joined', (data) => {
+  sessionStorage.setItem('quizTitle', data.quizTitle);
+  if (!data.isReconnect) {
+    // Join baru — tetap di lobby
+  }
+  // Kalau reconnect, game-started akan dikirim server dan handle otomatis
 });
 
 // ---- Player list updates (lobby) ----
@@ -147,15 +159,15 @@ window.socket.on('answer-result', (data) => {
 
   setTimeout(() => {
     if (data.correct) {
-      feedbackIcon.textContent  = '✅';
+      feedbackIcon.textContent = '✅';
       feedbackLabel.textContent = 'Jawaban benar!';
       feedbackLabel.style.color = 'var(--green)';
-      feedbackPts.textContent   = `Dapat +${data.score.toLocaleString()} poin`;
+      feedbackPts.textContent = `Dapat +${data.score.toLocaleString()} poin`;
     } else {
-      feedbackIcon.textContent  = '❌';
+      feedbackIcon.textContent = '❌';
       feedbackLabel.textContent = 'Jawaban salah';
       feedbackLabel.style.color = '#FF5252';
-      feedbackPts.textContent   = 'Dapat 0 poin';
+      feedbackPts.textContent = 'Dapat 0 poin';
     }
 
     yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';

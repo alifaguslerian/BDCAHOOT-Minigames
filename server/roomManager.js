@@ -1,32 +1,4 @@
-// In-memory store for active rooms
-// Structure: Map<roomCode, RoomObject>
-
 const rooms = new Map();
-
-/**
- * Room structure:
- * {
- *   code: string,
- *   hostId: string (socket.id),
- *   quizId: string,
- *   quiz: Object,        // full quiz data
- *   players: Map<socketId, PlayerObject>,
- *   state: 'lobby' | 'playing' | 'question' | 'reviewing' | 'finished',
- *   currentQuestionIndex: number,
- *   questionTimer: NodeJS.Timeout | null,
- *   questionStartTime: number | null,
- *   answeredThisRound: Set<socketId>
- * }
- *
- * Player structure:
- * {
- *   id: string,   // socket.id
- *   name: string,
- *   score: number,
- *   rank: number,
- *   answered: boolean
- * }
- */
 
 function createRoom(code, hostId) {
   const room = {
@@ -51,9 +23,7 @@ function getRoom(code) {
 
 function deleteRoom(code) {
   const room = rooms.get(code);
-  if (room && room.questionTimer) {
-    clearInterval(room.questionTimer);
-  }
+  if (room && room.questionTimer) clearInterval(room.questionTimer);
   rooms.delete(code);
 }
 
@@ -61,12 +31,34 @@ function addPlayer(code, socketId, playerName, avatar, avatarBg) {
   const room = getRoom(code);
   if (!room) return null;
 
-  for (const [, player] of room.players) {
+  // Cek apakah nama ini sudah ada — kalau ada dan disconnected, ini adalah reconnect
+  for (const [existingSocketId, player] of room.players) {
     if (player.name.toLowerCase() === playerName.toLowerCase()) {
+      if (player.disconnected) {
+        // Reconnect — update socket ID, clear disconnect timer
+        if (player.disconnectTimer) {
+          clearTimeout(player.disconnectTimer);
+          player.disconnectTimer = null;
+        }
+        room.players.delete(existingSocketId);
+        player.id = socketId;
+        player.disconnected = false;
+        room.players.set(socketId, player);
+
+        // Update answeredThisRound kalau socket lama ada di sana
+        if (room.answeredThisRound.has(existingSocketId)) {
+          room.answeredThisRound.delete(existingSocketId);
+          room.answeredThisRound.add(socketId);
+        }
+
+        return { player, isReconnect: true };
+      }
+      // Nama sama tapi masih connected — tolak
       return null;
     }
   }
 
+  // Player baru
   const player = {
     id: socketId,
     name: playerName,
@@ -74,27 +66,48 @@ function addPlayer(code, socketId, playerName, avatar, avatarBg) {
     avatarBg: avatarBg || '#1A2A6C',
     score: 0,
     rank: room.players.size + 1,
-    answered: false
+    answered: false,
+    disconnected: false,
+    disconnectTimer: null,
+    pendingResult: null,
+    lastAnswer: null
   };
   room.players.set(socketId, player);
-  return player;
+  return { player, isReconnect: false };
+}
+
+function disconnectPlayer(code, socketId, onRemove) {
+  const room = getRoom(code);
+  if (!room) return;
+
+  const player = room.players.get(socketId);
+  if (!player) return;
+
+  // Tandai disconnected, jangan hapus dulu
+  player.disconnected = true;
+
+  // Hapus setelah 30 detik kalau tidak reconnect
+  player.disconnectTimer = setTimeout(() => {
+    room.players.delete(socketId);
+    if (onRemove) onRemove(player);
+  }, 30000);
 }
 
 function removePlayer(code, socketId) {
   const room = getRoom(code);
   if (!room) return;
+  const player = room.players.get(socketId);
+  if (player && player.disconnectTimer) clearTimeout(player.disconnectTimer);
   room.players.delete(socketId);
 }
 
 function getPlayerList(code) {
   const room = getRoom(code);
   if (!room) return [];
-  return Array.from(room.players.values());
+  // Hanya return player yang masih connected
+  return Array.from(room.players.values()).filter(p => !p.disconnected);
 }
 
-/**
- * Find which room a socket is in (as player or host)
- */
 function findRoomBySocket(socketId) {
   for (const [, room] of rooms) {
     if (room.hostId === socketId) return room;
@@ -108,6 +121,7 @@ module.exports = {
   getRoom,
   deleteRoom,
   addPlayer,
+  disconnectPlayer,
   removePlayer,
   getPlayerList,
   findRoomBySocket,
