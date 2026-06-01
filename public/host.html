@@ -13,12 +13,12 @@
   <nav class="navbar">
     <div class="navbar-brand" onclick="window.location.href='/'">BDC<span>AH</span>OOT</div>
     <div class="navbar-actions">
-      <button class="btn btn-ghost btn-sm" onclick="window.location.href='/manage-quiz.html'"> My Quizzes</button>
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='/'">← Home</button>
       <button class="btn btn-primary btn-sm" onclick="window.location.href='/create-quiz.html'">+ Create Quiz</button>
     </div>
   </nav>
 
-  <!-- SETUP SCREEN (select quiz) -->
+  <!-- SETUP SCREEN -->
   <div id="setupScreen" style="max-width:680px;margin:0 auto;padding:100px 20px 60px;">
     <div style="margin-bottom:36px;">
       <h1 style="font-size:36px;margin-bottom:8px;">Host a Game</h1>
@@ -32,104 +32,128 @@
           <option value="">Loading quizzes...</option>
         </select>
       </div>
-
       <div id="quizInfo" style="display:none;margin-top:16px;">
         <div style="display:flex;gap:12px;align-items:center;">
           <span class="tag tag-blue" id="quizQCount"></span>
           <span class="text-muted" style="font-size:14px;" id="quizName"></span>
         </div>
       </div>
-
       <div style="margin-top:24px;">
-        <button class="btn btn-primary" style="width:100%;" id="startHostingBtn">
-          Start Room →
-        </button>
+        <button class="btn btn-primary" style="width:100%;" id="startHostingBtn">Start Room →</button>
       </div>
     </div>
   </div>
 
-  <!-- HOST GAME SCREEN -->
-  <div id="hostScreen" style="display:none;">
-    <div class="host-layout">
-
-      <!-- Main area -->
-      <div class="host-main">
-
-        <!-- Room Code -->
-        <div class="host-room-code-display">
-          <div class="room-code-label">Room Code</div>
-          <div class="room-code-value" id="displayRoomCode">------</div>
-          <p style="margin-top:12px;color:rgba(255,255,255,0.6);font-size:14px;">
-            Share this code with players at <strong>bdcahoot.app</strong>
-          </p>
-        </div>
-
-        <!-- Game status + controls -->
-        <div id="lobbyControls">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
-            <span class="pulse-dot"></span>
-            <span id="waitingText">Waiting for players to join...</span>
-          </div>
-
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <button class="btn btn-primary btn-lg" id="startGameBtn" disabled>
-              ▶ Start Game (<span id="playerCountLabel">0</span> players)
-            </button>
-            <button class="btn btn-ghost btn-sm" id="endHostBtn">
-              ✕ End Room
-            </button>
-          </div>
-        </div>
-
-        <!-- In-game controls -->
-        <div id="gameControls" style="display:none;">
-          <div
-            style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;margin-bottom:20px;">
-            <div
-              style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px;">
-              Current Question
-            </div>
-            <div id="hostQuestionText" style="font-size:22px;font-weight:700;margin-bottom:16px;">—</div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <span class="tag tag-green" id="hostQProgress">Q1 / 1</span>
-              <span id="hostTimerDisplay" style="color:var(--text-secondary);font-size:14px;"></span>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <button class="btn btn-solid" id="nextQuestionBtn">
-              Next Question →
-            </button>
-            <button class="btn btn-ghost btn-sm" id="endGameBtn">
-              End Game
-            </button>
-          </div>
-        </div>
-
-        <!-- Answer reveal (shown between questions) -->
-        <div id="answerRevealArea"
-          style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;">
-          <div
-            style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;">
-            Correct Answer</div>
-          <div id="hostCorrectAnswer" style="font-size:20px;font-weight:700;color:var(--green);"></div>
-          <div style="margin-top:16px;color:var(--text-secondary);font-size:14px;" id="hostAnswerStats"></div>
-        </div>
-
-      </div>
-
-      <!-- Sidebar: player list / leaderboard -->
-      <div class="host-sidebar">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <h3 style="font-size:16px;font-weight:700;" id="sidebarTitle">Players</h3>
-          <span class="tag tag-blue" id="sidebarCount">0</span>
-        </div>
-
-        <div class="player-list" id="playerListEl"></div>
-        <div class="leaderboard-list" id="hostLeaderboardEl" style="display:none;"></div>
-      </div>
-
+  <!-- LOBBY SCREEN -->
+  <div id="lobbyScreen" style="display:none;max-width:680px;margin:0 auto;padding:40px 20px;">
+    <div class="host-room-code-display" style="margin-bottom:28px;">
+      <div class="room-code-label">Room Code — Share this with players</div>
+      <div class="room-code-value" id="displayRoomCode">------</div>
+      <p style="margin-top:10px;color:rgba(255,255,255,0.5);font-size:13px;">
+        Players join at <strong style="color:#fff;">bdcahoot.app</strong>
+      </p>
     </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="pulse-dot"></span>
+        <span style="font-size:14px;color:var(--text-secondary);">Waiting for players...</span>
+      </div>
+      <span class="tag tag-blue" id="lobbyPlayerCount">0 players</span>
+    </div>
+
+    <div class="player-list" id="playerListEl" style="margin-bottom:24px;"></div>
+
+    <div style="display:flex;gap:12px;">
+      <button class="btn btn-primary btn-lg" style="flex:1;" id="startGameBtn" disabled>
+        ▶ Start Game (<span id="playerCountLabel">0</span> players)
+      </button>
+      <button class="btn btn-ghost" id="endHostBtn">✕ Close Room</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN — full display mode -->
+  <div id="gameScreen" style="display:none;" class="hd-layout">
+
+    <div class="hd-main">
+      <!-- Topbar -->
+      <div class="hd-topbar">
+        <div class="hd-pill" id="hdQProgress">Q1 / ?</div>
+        <div class="hd-answered-wrap">
+          <span class="pulse-dot"></span>
+          <span id="hdAnsweredCount">0</span>
+          <span style="color:rgba(255,255,255,0.4);font-size:12px;">/ <span id="hdTotalPlayers">0</span> answered</span>
+        </div>
+        <button class="hd-next-btn" id="nextQuestionBtn" disabled>Next →</button>
+      </div>
+
+      <!-- Question area -->
+      <div class="hd-center">
+        <div class="hd-timer-wrap">
+          <svg class="hd-timer-svg" viewBox="0 0 80 80">
+            <circle class="hd-timer-track" cx="40" cy="40" r="34" />
+            <circle class="hd-timer-prog" id="hdTimerProg" cx="40" cy="40" r="34" />
+          </svg>
+          <div class="hd-timer-num" id="hdTimerNum">—</div>
+        </div>
+
+        <div class="hd-question" id="hdQuestion">Get ready...</div>
+
+        <div class="hd-answers-grid" id="hdAnswersGrid">
+          <div class="hd-ans-card" data-index="0">
+            <div class="hd-ans-icon" data-index="0">▲</div>
+            <div class="hd-ans-text">—</div>
+            <div class="hd-dist-wrap" style="display:none;">
+              <div class="hd-dist-bg">
+                <div class="hd-dist-fill" style="width:0%"></div>
+              </div>
+              <div class="hd-dist-count">0</div>
+            </div>
+          </div>
+          <div class="hd-ans-card" data-index="1">
+            <div class="hd-ans-icon" data-index="1">◆</div>
+            <div class="hd-ans-text">—</div>
+            <div class="hd-dist-wrap" style="display:none;">
+              <div class="hd-dist-bg">
+                <div class="hd-dist-fill" style="width:0%"></div>
+              </div>
+              <div class="hd-dist-count">0</div>
+            </div>
+          </div>
+          <div class="hd-ans-card" data-index="2">
+            <div class="hd-ans-icon" data-index="2">●</div>
+            <div class="hd-ans-text">—</div>
+            <div class="hd-dist-wrap" style="display:none;">
+              <div class="hd-dist-bg">
+                <div class="hd-dist-fill" style="width:0%"></div>
+              </div>
+              <div class="hd-dist-count">0</div>
+            </div>
+          </div>
+          <div class="hd-ans-card" data-index="3">
+            <div class="hd-ans-icon" data-index="3">■</div>
+            <div class="hd-ans-text">—</div>
+            <div class="hd-dist-wrap" style="display:none;">
+              <div class="hd-dist-bg">
+                <div class="hd-dist-fill" style="width:0%"></div>
+              </div>
+              <div class="hd-dist-count">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar leaderboard -->
+    <div class="hd-sidebar">
+      <div class="hd-sb-head">
+        <h3>Live Ranks</h3>
+        <span>Top 5</span>
+      </div>
+      <div class="hd-lb-list" id="hdLeaderboard"></div>
+      <button class="hd-end-btn" id="endGameBtn">End Game</button>
+    </div>
+
   </div>
 
   <script src="/socket.io/socket.io.js"></script>

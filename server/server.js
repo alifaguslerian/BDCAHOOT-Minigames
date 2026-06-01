@@ -213,6 +213,10 @@ io.on('connection', (socket) => {
 
     // Hanya konfirmasi diterima, belum kasih tau bener/salah
     socket.emit('answer-received');
+
+    // Broadcast answered count ke host
+    const answeredSoFar = room.answeredThisRound.size;
+    io.to(room.code).emit('answered-update', { count: answeredSoFar });
   });
 
   // ----- HOST: End Game -----
@@ -263,107 +267,107 @@ io.on('connection', (socket) => {
 // HELPER FUNCTIONS
 // =====================
 
-  /**
-   * Send next question to room, start countdown timer
-   */
-  function sendNextQuestion(room) {
-    // Clear previous timer if any
-    if (room.questionTimer) {
+/**
+ * Send next question to room, start countdown timer
+ */
+function sendNextQuestion(room) {
+  // Clear previous timer if any
+  if (room.questionTimer) {
+    clearInterval(room.questionTimer);
+    room.questionTimer = null;
+  }
+
+  const questionData = gameLogic.nextQuestion(room);
+
+  if (!questionData) {
+    // No more questions — end the game
+    endGame(room);
+    return;
+  }
+
+  io.to(room.code).emit('question-started', questionData);
+
+  let timeLeft = questionData.timeLimit;
+
+  // Countdown timer — broadcasts every second
+  room.questionTimer = setInterval(() => {
+    timeLeft--;
+    io.to(room.code).emit('timer-update', { timeLeft });
+
+    if (timeLeft <= 0) {
       clearInterval(room.questionTimer);
       room.questionTimer = null;
+      revealAndLeaderboard(room);
     }
+  }, 1000);
+}
 
-    const questionData = gameLogic.nextQuestion(room);
-
-    if (!questionData) {
-      // No more questions — end the game
-      endGame(room);
-      return;
-    }
-
-    io.to(room.code).emit('question-started', questionData);
-
-    let timeLeft = questionData.timeLimit;
-
-    // Countdown timer — broadcasts every second
-    room.questionTimer = setInterval(() => {
-      timeLeft--;
-      io.to(room.code).emit('timer-update', { timeLeft });
-
-      if (timeLeft <= 0) {
-        clearInterval(room.questionTimer);
-        room.questionTimer = null;
-        revealAndLeaderboard(room);
-      }
-    }, 1000);
+/**
+ * Reveal correct answer + send leaderboard update
+ */
+function revealAndLeaderboard(room) {
+  if (room.questionTimer) {
+    clearInterval(room.questionTimer);
+    room.questionTimer = null;
   }
 
-  /**
-   * Reveal correct answer + send leaderboard update
-   */
-  function revealAndLeaderboard(room) {
-    if (room.questionTimer) {
-      clearInterval(room.questionTimer);
-      room.questionTimer = null;
+  const question = room.quiz.questions[room.currentQuestionIndex];
+  room.state = 'reviewing'; // set SEKARANG, sebelum setTimeout apapun
+
+  // Hitung distribusi
+  const distribution = [0, 0, 0, 0];
+  for (const [, player] of room.players) {
+    if (player.lastAnswer !== undefined && player.lastAnswer !== null) {
+      distribution[player.lastAnswer]++;
     }
-
-    const question = room.quiz.questions[room.currentQuestionIndex];
-    room.state = 'reviewing'; // set SEKARANG, sebelum setTimeout apapun
-
-    // Hitung distribusi
-    const distribution = [0, 0, 0, 0];
-    for (const [, player] of room.players) {
-      if (player.lastAnswer !== undefined && player.lastAnswer !== null) {
-        distribution[player.lastAnswer]++;
-      }
-    }
-
-    const leaderboard = gameLogic.getLeaderboard(room);
-
-    // Kirim answer-result ke tiap player pakai io.to(socketId)
-    for (const [socketId, player] of room.players) {
-      const result = player.pendingResult || {
-        correct: false,
-        correctAnswer: question.correctAnswer,
-        score: 0,
-        totalScore: player.score
-      };
-      io.to(socketId).emit('answer-result', result);
-      player.pendingResult = null;
-      player.lastAnswer = null;
-    }
-
-    // Kirim round-end setelah 2.5 detik — state sudah 'reviewing' dari atas
-    setTimeout(() => {
-      io.to(room.code).emit('round-end', {
-        correctAnswer: question.correctAnswer,
-        distribution,
-        totalPlayers: room.players.size,
-        leaderboard
-      });
-    }, 2500);
-  }
-  /**
-   * End the game and send final results
-   */
-  function endGame(room) {
-    room.state = 'finished';
-    const leaderboard = gameLogic.getLeaderboard(room);
-    io.to(room.code).emit('game-finished', { leaderboard });
-    console.log(`[Game] Finished in room ${room.code}`);
   }
 
-  // =====================
-  // START SERVER
-  // =====================
+  const leaderboard = gameLogic.getLeaderboard(room);
 
-  const PORT = process.env.PORT || 3000;
-  initDB().then(() => {
-    server.listen(PORT, () => {
-      console.log(`🎮 BDCAHOOT server running on port ${PORT}`);
-      console.log(`👉 http://localhost:${PORT}`);
+  // Kirim answer-result ke tiap player pakai io.to(socketId)
+  for (const [socketId, player] of room.players) {
+    const result = player.pendingResult || {
+      correct: false,
+      correctAnswer: question.correctAnswer,
+      score: 0,
+      totalScore: player.score
+    };
+    io.to(socketId).emit('answer-result', result);
+    player.pendingResult = null;
+    player.lastAnswer = null;
+  }
+
+  // Kirim round-end setelah 2.5 detik — state sudah 'reviewing' dari atas
+  setTimeout(() => {
+    io.to(room.code).emit('round-end', {
+      correctAnswer: question.correctAnswer,
+      distribution,
+      totalPlayers: room.players.size,
+      leaderboard
     });
-  }).catch(err => {
-    console.error('[DB] Failed to init:', err);
-    process.exit(1);
+  }, 2500);
+}
+/**
+ * End the game and send final results
+ */
+function endGame(room) {
+  room.state = 'finished';
+  const leaderboard = gameLogic.getLeaderboard(room);
+  io.to(room.code).emit('game-finished', { leaderboard });
+  console.log(`[Game] Finished in room ${room.code}`);
+}
+
+// =====================
+// START SERVER
+// =====================
+
+const PORT = process.env.PORT || 3000;
+initDB().then(() => {
+  server.listen(PORT, () => {
+    console.log(` BDCAHOOT server running on port ${PORT}`);
+    console.log(` http://localhost:${PORT}`);
   });
+}).catch(err => {
+  console.error('[DB] Failed to init:', err);
+  process.exit(1);
+});

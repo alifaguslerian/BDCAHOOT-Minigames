@@ -1,7 +1,6 @@
-// host.js — Host page: room creation, player tracking, game control
-
 const setupScreen = document.getElementById('setupScreen');
-const hostScreen = document.getElementById('hostScreen');
+const lobbyScreen = document.getElementById('lobbyScreen');
+const gameScreen = document.getElementById('gameScreen');
 const quizSelect = document.getElementById('quizSelect');
 const quizInfo = document.getElementById('quizInfo');
 const quizQCount = document.getElementById('quizQCount');
@@ -11,37 +10,35 @@ const displayRoomCode = document.getElementById('displayRoomCode');
 const startGameBtn = document.getElementById('startGameBtn');
 const playerCountLabel = document.getElementById('playerCountLabel');
 const playerListEl = document.getElementById('playerListEl');
-const lobbyControls = document.getElementById('lobbyControls');
-const gameControls = document.getElementById('gameControls');
-const hostQuestionText = document.getElementById('hostQuestionText');
-const hostQProgress = document.getElementById('hostQProgress');
-const hostTimerDisplay = document.getElementById('hostTimerDisplay');
-const nextQuestionBtn = document.getElementById('nextQuestionBtn');
-const endGameBtn = document.getElementById('endGameBtn');
+const lobbyPlayerCount = document.getElementById('lobbyPlayerCount');
 const endHostBtn = document.getElementById('endHostBtn');
-const answerRevealArea = document.getElementById('answerRevealArea');
-const hostCorrectAnswer = document.getElementById('hostCorrectAnswer');
-const hostAnswerStats = document.getElementById('hostAnswerStats');
-const sidebarTitle = document.getElementById('sidebarTitle');
-const sidebarCount = document.getElementById('sidebarCount');
-const hostLeaderboardEl = document.getElementById('hostLeaderboardEl');
+
+const hdQProgress = document.getElementById('hdQProgress');
+const hdAnsweredCount = document.getElementById('hdAnsweredCount');
+const hdTotalPlayers = document.getElementById('hdTotalPlayers');
+const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+const hdTimerProg = document.getElementById('hdTimerProg');
+const hdTimerNum = document.getElementById('hdTimerNum');
+const hdQuestion = document.getElementById('hdQuestion');
+const hdAnswersGrid = document.getElementById('hdAnswersGrid');
+const hdLeaderboard = document.getElementById('hdLeaderboard');
+const endGameBtn = document.getElementById('endGameBtn');
 
 let currentQuiz = null;
-let playerCount = 0;
-let currentPlayers = [];
+let totalPlayers = 0;
+let currentTimeLimit = 20;
+let answeredCount = 0;
 
 // ---- Load quizzes ----
 async function loadQuizzes() {
   try {
     const res = await fetch('/api/quizzes');
     const quizzes = await res.json();
-
     quizSelect.innerHTML = quizzes.length
       ? '<option value="">— Select a quiz —</option>' + quizzes.map(q =>
         `<option value="${q.id}" data-count="${q.questionCount}" data-title="${q.title}">
             ${q.title} (${q.questionCount} questions)
-          </option>`
-      ).join('')
+          </option>`).join('')
       : '<option value="">No quizzes found. Create one first.</option>';
   } catch (e) {
     quizSelect.innerHTML = '<option value="">Error loading quizzes</option>';
@@ -70,28 +67,25 @@ startHostingBtn.addEventListener('click', () => {
 window.socket.on('room-created', (data) => {
   displayRoomCode.textContent = data.code;
   setupScreen.style.display = 'none';
-  hostScreen.style.display = 'block';
-  sessionStorage.setItem('hostRoomCode', data.code);
+  lobbyScreen.style.display = 'block';
 });
 
 // ---- Player list updates ----
 window.socket.on('player-list-updated', (data) => {
-  playerCount = data.count;
-  currentPlayers = data.players;
+  totalPlayers = data.count;
   playerCountLabel.textContent = data.count;
-  sidebarCount.textContent = data.count;
-
+  lobbyPlayerCount.textContent = data.count + ' players';
+  hdTotalPlayers.textContent = data.count;
   startGameBtn.disabled = data.count === 0;
 
-  // Render player list
   playerListEl.innerHTML = data.players.map(p => `
-  <div class="player-item animate-in">
-    <div class="player-avatar" style="background:${p.avatarBg || '#1A2A6C'};font-size:16px;">
-      ${p.avatar || p.name.substring(0, 2).toUpperCase()}
+    <div class="player-item animate-in">
+      <div class="player-avatar" style="background:${p.avatarBg || '#1A2A6C'};font-size:16px;">
+        ${p.avatar || p.name.substring(0, 2).toUpperCase()}
+      </div>
+      <span style="font-weight:600;font-size:14px;">${p.name}</span>
     </div>
-    <span style="font-weight:600;font-size:14px;">${p.name}</span>
-  </div>
-`).join('');
+  `).join('');
 });
 
 // ---- Start game ----
@@ -101,64 +95,116 @@ startGameBtn.addEventListener('click', () => {
 });
 
 window.socket.on('game-started', () => {
-  lobbyControls.style.display = 'none';
-  gameControls.style.display = 'block';
-  sidebarTitle.textContent = 'Live Ranks';
-
-  // Switch sidebar to leaderboard
-  playerListEl.style.display = 'none';
-  hostLeaderboardEl.style.display = 'flex';
-  hostLeaderboardEl.style.flexDirection = 'column';
+  lobbyScreen.style.display = 'none';
+  gameScreen.style.display = 'grid';
 });
 
 // ---- Question started ----
 window.socket.on('question-started', (data) => {
-  answerRevealArea.style.display = 'none';
+  answeredCount = 0;
+  currentTimeLimit = data.timeLimit;
+
+  hdQProgress.textContent = `Q${data.questionIndex + 1} / ${data.totalQuestions}`;
+  hdQuestion.textContent = data.question;
+  hdAnsweredCount.textContent = '0';
+  hdTotalPlayers.textContent = totalPlayers;
   nextQuestionBtn.disabled = true;
 
-  hostQuestionText.textContent = data.question;
-  hostQProgress.textContent = `Q${data.questionIndex + 1} / ${data.totalQuestions}`;
-  hostTimerDisplay.textContent = `${data.timeLimit}s`;
+  // Reset timer
+  hdTimerProg.style.strokeDashoffset = '0';
+  hdTimerProg.classList.remove('urgent', 'critical');
+  hdTimerNum.textContent = data.timeLimit;
+
+  // Set answer cards
+  const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');
+  cards.forEach((card, i) => {
+    card.querySelector('.hd-ans-text').textContent = data.options[i] || '—';
+    card.classList.remove('correct', 'wrong');
+    card.style.opacity = '1';
+    const dist = card.querySelector('.hd-dist-wrap');
+    if (dist) dist.style.display = 'none';
+  });
 });
 
 // ---- Timer update ----
 window.socket.on('timer-update', (data) => {
-  hostTimerDisplay.textContent = `${data.timeLeft}s remaining`;
-  if (data.timeLeft <= 5) {
-    hostTimerDisplay.style.color = '#FF5252';
-  } else {
-    hostTimerDisplay.style.color = 'var(--text-secondary)';
+  const timeLeft = data.timeLeft;
+  hdTimerNum.textContent = timeLeft;
+
+  const offset = 213 * (1 - timeLeft / currentTimeLimit);
+  hdTimerProg.style.strokeDashoffset = offset;
+
+  if (timeLeft <= 5 && timeLeft > 0) {
+    hdTimerProg.classList.add('critical');
+    hdTimerProg.classList.remove('urgent');
+  } else if (timeLeft <= 10) {
+    hdTimerProg.classList.add('urgent');
+    hdTimerProg.classList.remove('critical');
   }
 });
 
-// Round end — update leaderboard + distribusi jawaban
+// ---- Round end ----
 window.socket.on('round-end', (data) => {
-  answerRevealArea.style.display = 'flex';
-  hostCorrectAnswer.textContent = `Option ${data.correctAnswer + 1}`;
-  hostAnswerStats.textContent = `${data.distribution[data.correctAnswer] || 0} player(s) answered correctly`;
-
-  renderHostLeaderboard(data.leaderboard);
   nextQuestionBtn.disabled = false;
+
+  const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');
+  cards.forEach((card, i) => {
+    const count = data.distribution[i] || 0;
+    const pct = Math.round((count / Math.max(data.totalPlayers, 1)) * 100);
+
+    if (i === data.correctAnswer) {
+      card.classList.add('correct');
+    } else {
+      card.classList.add('wrong');
+    }
+
+    const dist = card.querySelector('.hd-dist-wrap');
+    const fill = card.querySelector('.hd-dist-fill');
+    const countEl = card.querySelector('.hd-dist-count');
+
+    dist.style.display = 'block';
+    countEl.textContent = count;
+    setTimeout(() => { fill.style.width = pct + '%'; }, 50);
+  });
+
+  renderLeaderboard(data.leaderboard);
 });
 
-function renderHostLeaderboard(leaderboard) {
-  hostLeaderboardEl.innerHTML = leaderboard.slice(0, 10).map((p, i) => `
-    <div class="lb-item ${i < 3 ? 'top-3' : ''}">
-      <div class="lb-rank">${p.rank}</div>
-      <div class="lb-avatar" style="background:${p.avatarBg || '#1A2A6C'};font-size:14px;">
-        ${p.avatar || p.name.substring(0, 2).toUpperCase()}
+// ---- Track answered count via leaderboard ----
+// Setiap ada yang jawab, server broadcast leaderboard — pakai ini buat update counter
+window.socket.on('leaderboard-updated', (data) => {
+  // tidak dipakai, round-end yang handle
+});
+
+function renderLeaderboard(board) {
+  hdLeaderboard.innerHTML = board.slice(0, 5).map((p, i) => {
+    const tClass = i === 0 ? 't1' : i === 1 ? 't2' : i === 2 ? 't3' : '';
+    return `
+      <div class="hd-lb-row ${tClass}">
+        <div class="hd-lb-rank">${p.rank}</div>
+        <div class="hd-lb-av" style="background:${p.avatarBg || '#1A2A6C'};font-size:13px;">
+          ${p.avatar || p.name.substring(0, 2).toUpperCase()}
+        </div>
+        <div class="hd-lb-name">${p.name}</div>
+        <div class="hd-lb-score">${p.score.toLocaleString()}</div>
       </div>
-      <div class="lb-name">${p.name}</div>
-      <div class="lb-score">${p.score.toLocaleString()}</div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // ---- Next question ----
 nextQuestionBtn.addEventListener('click', () => {
   window.socket.emit('next-question');
-  answerRevealArea.style.display = 'none';
   nextQuestionBtn.disabled = true;
+  const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');
+  cards.forEach(c => {
+    c.classList.remove('correct', 'wrong');
+    c.style.opacity = '1';
+    const dist = c.querySelector('.hd-dist-wrap');
+    if (dist) dist.style.display = 'none';
+    const fill = c.querySelector('.hd-dist-fill');
+    if (fill) fill.style.width = '0%';
+  });
 });
 
 // ---- End game ----
@@ -173,14 +219,14 @@ endHostBtn.addEventListener('click', () => {
   }
 });
 
+window.socket.on('answered-update', (data) => {
+  hdAnsweredCount.textContent = data.count;
+});
+
 // ---- Game finished ----
 window.socket.on('game-finished', (data) => {
-  // Simpan leaderboard sebelumnya untuk animasi perubahan ranking
-  const currentLeaderboard = sessionStorage.getItem('finalLeaderboard');
-  if (currentLeaderboard) {
-    sessionStorage.setItem('previousLeaderboard', currentLeaderboard);
-  }
   sessionStorage.setItem('finalLeaderboard', JSON.stringify(data.leaderboard));
   sessionStorage.setItem('isHost', 'true');
   window.location.href = '/result.html';
 });
+
