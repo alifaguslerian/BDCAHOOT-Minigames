@@ -147,6 +147,7 @@ window.socket.on('timer-update', (data) => {
 // ---- Round end ----
 window.socket.on('round-end', (data) => {
   nextQuestionBtn.disabled = false;
+  document.getElementById('nextFloatBtn').style.display = 'block';
 
   const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');
   cards.forEach((card, i) => {
@@ -197,6 +198,7 @@ function renderLeaderboard(board) {
 nextQuestionBtn.addEventListener('click', () => {
   window.socket.emit('next-question');
   nextQuestionBtn.disabled = true;
+  document.getElementById('nextFloatBtn').style.display = 'none';
   const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');
   cards.forEach(c => {
     c.classList.remove('correct', 'wrong');
