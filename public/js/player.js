@@ -116,7 +116,7 @@ window.socket.on('timer-update', (data) => {
 // ---- Submit answer ----
 answersGrid.addEventListener('click', (e) => {
 
-  const btn = e.target.closest('.answer-btn');
+  const btn = e.target.closest('.pg-ans-btn');
   if (!btn || hasAnswered) return;
 
   const answerIndex = parseInt(btn.dataset.index);
