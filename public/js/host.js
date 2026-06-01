@@ -97,6 +97,7 @@ startGameBtn.addEventListener('click', () => {
 window.socket.on('game-started', () => {
   lobbyScreen.style.display = 'none';
   gameScreen.style.display = 'grid';
+  startCountdown(); // countdown 3-2-1 sebelum soal pertama
 });
 
 // ---- Question started ----

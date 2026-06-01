@@ -155,10 +155,27 @@
     </div>
 
   </div>
+  <!-- COUNTDOWN OVERLAY -->
+  <div class="countdown-overlay" id="countdownOverlay">
+    <div class="cd-label">Game starting in</div>
+    <div style="position:relative;width:260px;height:260px;display:flex;align-items:center;justify-content:center;">
+      <div class="cd-ring-wrap">
+        <svg class="cd-svg-ring" viewBox="0 0 260 260">
+          <circle class="cd-ring-track" cx="130" cy="130" r="120" />
+          <circle class="cd-ring-prog" id="cdRingProg" cx="130" cy="130" r="120" />
+        </svg>
+        <div class="cd-ripple" id="cdRipple"></div>
+      </div>
+      <div class="cd-number" id="cdNumber">3</div>
+    </div>
+    <div class="cd-sub" id="cdSub">Get ready...</div>
+  </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/socket.js"></script>
+  <script src="/js/countdown.js"></script>
   <script src="/js/host.js"></script>
+
 </body>
 
 </html>
