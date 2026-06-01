@@ -78,14 +78,11 @@ window.socket.on('question-started', (data) => {
   questionText.textContent = data.question;
   qProgressDisplay.textContent = `Q${data.questionIndex + 1} / ${data.totalQuestions}`;
 
-  // Reset timer ring
-  const circumference = 263;
   timerProgress.style.strokeDashoffset = '0';
   timerProgress.classList.remove('urgent', 'critical');
   timerNumber.textContent = data.timeLimit;
 
-  // Set answer text
-  const btns = answersGrid.querySelectorAll('.answer-btn');
+  const btns = answersGrid.querySelectorAll('.pg-ans-btn');
   btns.forEach((btn, i) => {
     btn.querySelector('.answer-text').textContent = data.options[i] || '—';
     btn.disabled = false;
@@ -93,7 +90,6 @@ window.socket.on('question-started', (data) => {
     btn.style.opacity = '1';
   });
 
-  // Hide feedback
   feedbackOverlay.classList.remove('show');
 });
 
@@ -102,14 +98,11 @@ window.socket.on('timer-update', (data) => {
   const timeLeft = data.timeLeft;
   timerNumber.textContent = timeLeft;
 
-  // Animate progress ring
-  const circumference = 263;
   const progress = timeLeft / currentTimeLimit;
-  const offset = circumference * (1 - progress);
+  const offset = 232 * (1 - progress); // 232 = circumference baru (r=37)
   timerProgress.style.strokeDashoffset = offset;
 
-  // Color feedback
-  if (timeLeft <= 5) {
+  if (timeLeft <= 5 && timeLeft > 0) {
     timerProgress.classList.add('critical');
     timerProgress.classList.remove('urgent');
   } else if (timeLeft <= 10) {
@@ -117,10 +110,7 @@ window.socket.on('timer-update', (data) => {
     timerProgress.classList.remove('critical');
   }
 
-  // If time ran out and player hasn't answered
-  if (timeLeft <= 0 && !hasAnswered) {
-    lockAnswers();
-  }
+  if (timeLeft <= 0 && !hasAnswered) lockAnswers();
 });
 
 // ---- Submit answer ----
@@ -138,10 +128,10 @@ answersGrid.addEventListener('click', (e) => {
 });
 
 function lockAnswers(selectedBtn = null) {
-  const btns = answersGrid.querySelectorAll('.answer-btn');
+  const btns = answersGrid.querySelectorAll('.pg-ans-btn');
   btns.forEach(b => {
     b.disabled = true;
-    if (b !== selectedBtn) b.style.opacity = '0.5';
+    if (b !== selectedBtn) b.style.opacity = '0.4';
   });
 }
 
@@ -181,34 +171,29 @@ window.socket.on('answer-result', (data) => {
 
 // Round end — update leaderboard + distribusi jawaban
 window.socket.on('round-end', (data) => {
-  // Keep answer-result popup visible briefly so the player can read it
-  setTimeout(() => {
-    feedbackOverlay.classList.remove('show');
-  }, 1800);
+  setTimeout(() => { feedbackOverlay.classList.remove('show'); }, 1800);
 
-  // Update answer buttons dengan distribusi
-  const btns = answersGrid.querySelectorAll('.answer-btn');
+  const btns = answersGrid.querySelectorAll('.pg-ans-btn');
   btns.forEach((btn, i) => {
     btn.disabled = true;
     const count = data.distribution[i] || 0;
-    const pct = Math.round((count / data.totalPlayers) * 100);
+    const pct   = Math.round((count / Math.max(data.totalPlayers, 1)) * 100);
 
     if (i === data.correctAnswer) {
       btn.classList.add('correct');
       btn.style.opacity = '1';
     } else {
       btn.classList.add('wrong');
-      btn.style.opacity = '0.5';
+      btn.style.opacity = '0.4';
     }
 
-    // Tambah bar distribusi
     const textEl = btn.querySelector('.answer-text');
-    const iconEl = btn.querySelector('.answer-icon');
+    const iconEl = btn.querySelector('.pg-ans-icon');
     if (textEl && iconEl) {
       btn.innerHTML = `
-        <div class="answer-icon">${iconEl.innerHTML}</div>
+        <div class="pg-ans-icon" data-index="${i}">${iconEl.textContent}</div>
         <span class="answer-text">${textEl.textContent}</span>
-        <div class="answer-dist">
+        <div class="answer-dist" style="margin-left:auto;">
           <div class="answer-dist-bar" style="width:${pct}%"></div>
           <span class="answer-dist-label">${count}</span>
         </div>
@@ -216,7 +201,6 @@ window.socket.on('round-end', (data) => {
     }
   });
 
-  // Update leaderboard sidebar
   renderLeaderboard(data.leaderboard);
 });
 
