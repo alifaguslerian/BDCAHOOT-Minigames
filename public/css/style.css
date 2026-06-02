@@ -686,8 +686,10 @@ footer {
 .host-room-code-display {
   background: var(--royal-blue);
   border-radius: var(--radius-xl);
-  padding: 32px;
+  padding: 28px;
   text-align: center;
+  margin-bottom: 28px;
+  margin-top: 32px;
 }
 
 .room-code-label {
