@@ -36,7 +36,7 @@ async function loadQuizzes() {
 }
 
 function editQuiz(id) {
-  window.location.href = `/create-quiz.html?edit=${id}`;
+  window.location.href = `/quiz-preview.html?id=${id}`;
 }
 
 async function deleteQuiz(id, title) {

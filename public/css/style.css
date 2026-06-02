@@ -2631,3 +2631,140 @@ footer {
   transform: scale(1.04);
   box-shadow: 0 12px 40px rgba(0, 230, 118, 0.5);
 }
+
+/* =============================================
+   QUIZ PREVIEW PAGE
+   ============================================= */
+.qp-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 18px 20px;
+  margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+
+.qp-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.qp-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.qp-card-num {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-top: 3px;
+  min-width: 24px;
+}
+
+.qp-card-q {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.qp-card-btns {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.qp-icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.qp-icon-btn:hover {
+  background: var(--surface-3);
+  color: var(--text-primary);
+}
+.qp-icon-btn.del:hover {
+  border-color: rgba(255, 82, 82, 0.4);
+  color: #ff5252;
+}
+
+.qp-opts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.qp-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.qp-opt.correct {
+  border-color: rgba(0, 230, 118, 0.35);
+  background: rgba(0, 230, 118, 0.08);
+  color: var(--green);
+}
+
+.qp-opt-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  flex-shrink: 0;
+}
+
+.qp-opt.correct .qp-opt-dot {
+  background: var(--green);
+}
+
+.qp-timer {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.qp-add-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: all 0.15s;
+}
+
+.qp-add-row:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--text-secondary);
+  background: var(--surface);
+}

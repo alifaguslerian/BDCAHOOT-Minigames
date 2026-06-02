@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview Quiz — BDCAHOOT</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-brand" onclick="window.location.href='/'">BDC<span>AH</span>OOT</div>
+        <div class="navbar-actions">
+            <button class="btn btn-ghost btn-sm" onclick="window.location.href='/host.html'">← Back</button>
+        </div>
+    </nav>
+
+    <div style="max-width:780px;margin:0 auto;padding:100px 20px 60px;">
+
+        <!-- Header -->
+        <div
+            style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap;">
+            <div>
+                <h1 style="font-size:28px;margin-bottom:6px;" id="previewTitle">Loading...</h1>
+                <p style="color:var(--text-secondary);font-size:14px;" id="previewMeta">—</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-shrink:0;">
+                <button class="btn btn-ghost btn-sm" id="addQuestionBtn">
+                    + Add Question
+                </button>
+                <button class="btn btn-primary" id="startGameBtn">
+                    ▶ Start Game
+                </button>
+            </div>
+        </div>
+
+        <!-- Question list -->
+        <div id="questionList"></div>
+
+        <!-- Add question shortcut bottom -->
+        <div class="qp-add-row" id="addRowBtn">
+            <span>+ Add another question</span>
+        </div>
+
+        <!-- Footer -->
+        <div
+            style="display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);">
+            <span style="font-size:13px;color:var(--text-secondary);" id="footerMeta">Loading...</span>
+            <button class="btn btn-primary" id="startGameBtn2">▶ Start Game</button>
+        </div>
+
+    </div>
+
+    <!-- Edit Question Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal" style="position:relative;max-width:560px;max-height:90vh;overflow-y:auto;">
+            <button class="modal-close" id="closeEditModal">✕</button>
+            <h2 style="margin-bottom:6px;">Edit Question</h2>
+            <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Update question text, options, and
+                timer</p>
+
+            <div class="form-group">
+                <label>Question Text</label>
+                <input type="text" class="form-control" id="editQuestionText" placeholder="Enter question..."
+                    maxlength="300" />
+            </div>
+
+            <div class="form-group">
+                <label>Answer Options (select correct one)</label>
+                <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <input type="radio" name="editCorrect" value="0" id="editR0"
+                            style="accent-color:var(--green);width:18px;height:18px;" />
+                        <input type="text" class="form-control" id="editOpt0" placeholder="Option 1" maxlength="150" />
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <input type="radio" name="editCorrect" value="1" id="editR1"
+                            style="accent-color:var(--green);width:18px;height:18px;" />
+                        <input type="text" class="form-control" id="editOpt1" placeholder="Option 2" maxlength="150" />
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <input type="radio" name="editCorrect" value="2" id="editR2"
+                            style="accent-color:var(--green);width:18px;height:18px;" />
+                        <input type="text" class="form-control" id="editOpt2" placeholder="Option 3" maxlength="150" />
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <input type="radio" name="editCorrect" value="3" id="editR3"
+                            style="accent-color:var(--green);width:18px;height:18px;" />
+                        <input type="text" class="form-control" id="editOpt3" placeholder="Option 4" maxlength="150" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="max-width:200px;">
+                <label>Time Limit</label>
+                <select class="form-control" id="editTimer">
+                    <option value="10">10s</option>
+                    <option value="15">15s</option>
+                    <option value="20">20s</option>
+                    <option value="30">30s</option>
+                    <option value="45">45s</option>
+                    <option value="60">60s</option>
+                </select>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:8px;">
+                <button class="btn btn-primary" style="flex:1;" id="saveEditBtn">Save Changes ✓</button>
+                <button class="btn btn-ghost" id="cancelEditBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/socket.js"></script>
+    <script src="/js/quizPreview.js"></script>
+</body>
+
+</html>

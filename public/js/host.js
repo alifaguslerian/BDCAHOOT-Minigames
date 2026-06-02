@@ -45,6 +45,18 @@ async function loadQuizzes() {
   }
 }
 
+// Kalau dari preview page — langsung create room
+const urlParams = new URLSearchParams(window.location.search);
+const autoStartId = urlParams.get('start');
+if (autoStartId) {
+  // Tunggu socket connect lalu langsung buat room
+  window.socket.on('connect', () => {
+    window.socket.emit('create-room', { quizId: autoStartId });
+  });
+  // Sembunyikan setup screen
+  setupScreen.style.display = 'none';
+}
+
 loadQuizzes();
 
 quizSelect.addEventListener('change', () => {
@@ -59,9 +71,8 @@ quizSelect.addEventListener('change', () => {
 // ---- Start hosting ----
 startHostingBtn.addEventListener('click', () => {
   if (!currentQuiz) { alert('Please select a quiz first.'); return; }
-  window.socket.emit('create-room', { quizId: currentQuiz.id });
-  startHostingBtn.disabled = true;
-  startHostingBtn.textContent = 'Creating room...';
+  // Redirect ke preview page dulu
+  window.location.href = `/quiz-preview.html?id=${currentQuiz.id}`;
 });
 
 window.socket.on('room-created', (data) => {
