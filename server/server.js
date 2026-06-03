@@ -200,9 +200,17 @@ io.on('connection', (socket) => {
   socket.on('next-question', () => {
     const room = roomManager.findRoomBySocket(socket.id);
     if (!room || room.hostId !== socket.id) return;
-    if (room.state !== 'reviewing') return; // guard: hanya bisa next kalau lagi di fase review
-    sendNextQuestion(room);
+    if (room.state !== 'reviewing') return;
+
+    // Cek apakah ini soal terakhir
+    const isLast = room.currentQuestionIndex >= room.quiz.questions.length - 1;
+    if (isLast) {
+      endGame(room);
+    } else {
+      sendNextQuestion(room);
+    }
   });
+  
   // ----- PLAYER: Submit Answer -----
   socket.on('submit-answer', ({ answerIndex }) => {
     const room = roomManager.findRoomBySocket(socket.id);

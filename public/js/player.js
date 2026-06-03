@@ -278,14 +278,9 @@ function renderLeaderboard(board) {
 
 // ---- Game finished ----
 window.socket.on('game-finished', (data) => {
-  // Simpan leaderboard sebelumnya untuk animasi perubahan ranking
-  const currentLeaderboard = sessionStorage.getItem('finalLeaderboard');
-  if (currentLeaderboard) {
-    sessionStorage.setItem('previousLeaderboard', currentLeaderboard);
-  }
   sessionStorage.setItem('finalLeaderboard', JSON.stringify(data.leaderboard));
   sessionStorage.setItem('playerName', playerName);
-  window.location.href = '/result.html';
+  window.location.href = '/final-podium.html';
 });
 
 // ---- Host left ----

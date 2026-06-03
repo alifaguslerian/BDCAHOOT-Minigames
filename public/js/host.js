@@ -160,6 +160,20 @@ window.socket.on('round-end', (data) => {
   nextQuestionBtn.disabled = false;
   document.getElementById('nextFloatBtn').style.display = 'block';
 
+  const currentQ = parseInt(hdQProgress.textContent.split('/')[0].replace('Q', '').trim());
+  const totalQ = parseInt(hdQProgress.textContent.split('/')[1].trim());
+
+  const floatBtn = document.querySelector('#nextFloatBtn button');
+  if (currentQ >= totalQ) {
+    floatBtn.textContent = 'Lihat Hasil 🏆';
+    floatBtn.style.background = '#FFD600';
+    floatBtn.style.color = '#000';
+  } else {
+    floatBtn.textContent = 'Next Question →';
+    floatBtn.style.background = '';
+    floatBtn.style.color = '';
+  }
+
   const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');
   cards.forEach((card, i) => {
     const count = data.distribution[i] || 0;
@@ -241,6 +255,6 @@ window.socket.on('answered-update', (data) => {
 window.socket.on('game-finished', (data) => {
   sessionStorage.setItem('finalLeaderboard', JSON.stringify(data.leaderboard));
   sessionStorage.setItem('isHost', 'true');
-  window.location.href = '/result.html';
+  window.location.href = '/final-podium.html';
 });
 
