@@ -165,7 +165,7 @@ window.socket.on('round-end', (data) => {
 
   const floatBtn = document.querySelector('#nextFloatBtn button');
   if (currentQ >= totalQ) {
-    floatBtn.textContent = 'Lihat Hasil 🏆';
+    floatBtn.textContent = 'Lihat Hasil ';
     floatBtn.style.background = '#FFD600';
     floatBtn.style.color = '#000';
   } else {
