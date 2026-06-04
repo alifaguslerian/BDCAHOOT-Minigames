@@ -82,12 +82,18 @@ window.socket.on('question-started', (data) => {
   timerProgress.classList.remove('urgent', 'critical');
   timerNumber.textContent = data.timeLimit;
 
+  // Reset buttons — rebuild innerHTML bersih tanpa distribusi
   const btns = answersGrid.querySelectorAll('.pg-ans-btn');
+  const icons = ['▲', '◆', '●', '■'];
   btns.forEach((btn, i) => {
-    btn.querySelector('.answer-text').textContent = data.options[i] || '—';
     btn.disabled = false;
     btn.classList.remove('correct', 'wrong', 'selected');
     btn.style.opacity = '1';
+    // Rebuild HTML bersih — hapus semua jejak distribusi
+    btn.innerHTML = `
+      <div class="pg-ans-icon" data-index="${i}">${icons[i]}</div>
+      <span class="answer-text">${data.options[i] || '—'}</span>
+    `;
   });
 
   feedbackOverlay.classList.remove('show');
