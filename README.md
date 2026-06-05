@@ -1,6 +1,6 @@
 # BDCAHOOT 🎮
 
-Realtime multiplayer quiz platform for student communities and events.
+Realtime multiplayer quiz platform for student communities and events in university.
 
 ## Stack
 - **Frontend**: HTML, CSS, Vanilla JS
