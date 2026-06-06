@@ -2239,8 +2239,8 @@ footer {
    HOST DISPLAY SCREEN
    ============================================= */
 .hd-layout {
-  display: grid;
-  grid-template-columns: 1fr 280px;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background: var(--midnight);
 }

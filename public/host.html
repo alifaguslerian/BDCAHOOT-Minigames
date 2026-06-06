@@ -93,7 +93,10 @@
           <span id="hdAnsweredCount">0</span>
           <span style="color:rgba(255,255,255,0.4);font-size:12px;">/ <span id="hdTotalPlayers">0</span> answered</span>
         </div>
-        <button class="hd-next-btn" id="nextQuestionBtn" disabled>Next →</button>
+        <div style="display:flex;gap:8px;">
+          <button class="hd-next-btn" id="nextQuestionBtn" disabled>Next →</button>
+          <button class="hd-end-btn" id="endGameBtn" style="margin:0;">End</button>
+        </div>
       </div>
 
       <!-- Question area -->
@@ -152,18 +155,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Sidebar leaderboard -->
-    <div class="hd-sidebar">
-      <div class="hd-sb-head">
-        <h3>Live Ranks</h3>
-        <span>Top 5</span>
-      </div>
-      <div class="hd-lb-list" id="hdLeaderboard"></div>
-      <button class="hd-end-btn" id="endGameBtn">End Game</button>
-    </div>
-
-
 
   </div>
   <!-- COUNTDOWN OVERLAY -->

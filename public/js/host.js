@@ -21,7 +21,6 @@ const hdTimerProg = document.getElementById('hdTimerProg');
 const hdTimerNum = document.getElementById('hdTimerNum');
 const hdQuestion = document.getElementById('hdQuestion');
 const hdAnswersGrid = document.getElementById('hdAnswersGrid');
-const hdLeaderboard = document.getElementById('hdLeaderboard');
 const endGameBtn = document.getElementById('endGameBtn');
 const hostLbScreen = document.getElementById('hostLbScreen');
 const hostLbList   = document.getElementById('hostLbList');
@@ -218,19 +217,6 @@ window.socket.on('leaderboard-updated', (data) => {
 });
 
 function renderLeaderboard(board) {
-  hdLeaderboard.innerHTML = board.slice(0, 5).map((p, i) => {
-    const tClass = i === 0 ? 't1' : i === 1 ? 't2' : i === 2 ? 't3' : '';
-    return `
-      <div class="hd-lb-row ${tClass}">
-        <div class="hd-lb-rank">${p.rank}</div>
-        <div class="hd-lb-av" style="background:${p.avatarBg || '#1A2A6C'};font-size:13px;">
-          ${p.avatar || p.name.substring(0, 2).toUpperCase()}
-        </div>
-        <div class="hd-lb-name">${p.name}</div>
-        <div class="hd-lb-score">${p.score.toLocaleString()}</div>
-      </div>
-    `;
-  }).join('');
 }
 
 function renderHostLbScreen(board) {
