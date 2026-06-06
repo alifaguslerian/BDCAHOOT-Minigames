@@ -2776,7 +2776,7 @@ footer {
    ============================================= */
 .fp-wrap {
   min-height: 100vh;
-  background: #0A0A1A;
+  background: #0a0a1a;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2789,15 +2789,19 @@ footer {
 .fp-bg {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(24,0,173,0.45) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 100%,
+    rgba(24, 0, 173, 0.45) 0%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
 .fp-title {
-  font-family: 'Bricolage Grotesque', sans-serif;
+  font-family: "Bricolage Grotesque", sans-serif;
   font-size: clamp(36px, 7vw, 64px);
   font-weight: 800;
-  background: linear-gradient(135deg, #00D4FF, #00E676);
+  background: linear-gradient(135deg, #00d4ff, #00e676);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2810,7 +2814,7 @@ footer {
 
 .fp-sub {
   font-size: 15px;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.4);
   margin-bottom: 48px;
   opacity: 0;
   position: relative;
@@ -2838,9 +2842,15 @@ footer {
   opacity: 0;
 }
 
-.fp-player.rank-3 { animation: fpRiseUp 0.7s cubic-bezier(0.34,1.4,0.64,1) 0.8s forwards; }
-.fp-player.rank-2 { animation: fpRiseUp 0.7s cubic-bezier(0.34,1.4,0.64,1) 1.5s forwards; }
-.fp-player.rank-1 { animation: fpRiseUp 0.7s cubic-bezier(0.34,1.4,0.64,1) 2.2s forwards; }
+.fp-player.rank-3 {
+  animation: fpRiseUp 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 0.8s forwards;
+}
+.fp-player.rank-2 {
+  animation: fpRiseUp 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 1.5s forwards;
+}
+.fp-player.rank-1 {
+  animation: fpRiseUp 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 2.2s forwards;
+}
 
 .fp-avatar-wrap {
   position: relative;
@@ -2855,15 +2865,15 @@ footer {
   align-items: center;
   justify-content: center;
   font-size: 28px;
-  border: 3px solid rgba(255,255,255,0.1);
+  border: 3px solid rgba(255, 255, 255, 0.1);
 }
 
 .fp-player.rank-1 .fp-avatar {
   width: 84px;
   height: 84px;
   font-size: 36px;
-  border-color: #FFD600;
-  box-shadow: 0 0 32px rgba(255,214,0,0.4);
+  border-color: #ffd600;
+  box-shadow: 0 0 32px rgba(255, 214, 0, 0.4);
 }
 
 .fp-badge {
@@ -2878,15 +2888,24 @@ footer {
   justify-content: center;
   font-size: 11px;
   font-weight: 800;
-  border: 2px solid #0A0A1A;
+  border: 2px solid #0a0a1a;
 }
 
-.fp-player.rank-1 .fp-badge { background: #FFD600; color: #000; }
-.fp-player.rank-2 .fp-badge { background: #C0C0C0; color: #000; }
-.fp-player.rank-3 .fp-badge { background: #CD7F32; color: #000; }
+.fp-player.rank-1 .fp-badge {
+  background: #ffd600;
+  color: #000;
+}
+.fp-player.rank-2 .fp-badge {
+  background: #c0c0c0;
+  color: #000;
+}
+.fp-player.rank-3 .fp-badge {
+  background: #cd7f32;
+  color: #000;
+}
 
 .fp-name {
-  font-family: 'Bricolage Grotesque', sans-serif;
+  font-family: "Bricolage Grotesque", sans-serif;
   font-size: 15px;
   font-weight: 800;
   color: #fff;
@@ -2900,12 +2919,14 @@ footer {
 
 .fp-score {
   font-size: 12px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255, 255, 255, 0.45);
   margin-bottom: 14px;
   text-align: center;
 }
 
-.fp-player.rank-1 .fp-score { color: rgba(255,214,0,0.8); }
+.fp-player.rank-1 .fp-score {
+  color: rgba(255, 214, 0, 0.8);
+}
 
 .fp-stand {
   width: 100%;
@@ -2918,20 +2939,20 @@ footer {
 
 .fp-player.rank-1 .fp-stand {
   height: 120px;
-  background: rgba(255,214,0,0.12);
-  border: 1px solid rgba(255,214,0,0.25);
+  background: rgba(255, 214, 0, 0.12);
+  border: 1px solid rgba(255, 214, 0, 0.25);
 }
 
 .fp-player.rank-2 .fp-stand {
   height: 80px;
-  background: rgba(192,192,192,0.08);
-  border: 1px solid rgba(192,192,192,0.18);
+  background: rgba(192, 192, 192, 0.08);
+  border: 1px solid rgba(192, 192, 192, 0.18);
 }
 
 .fp-player.rank-3 .fp-stand {
   height: 60px;
-  background: rgba(205,127,50,0.08);
-  border: 1px solid rgba(205,127,50,0.18);
+  background: rgba(205, 127, 50, 0.08);
+  border: 1px solid rgba(205, 127, 50, 0.18);
 }
 
 .fp-back-btn {
@@ -2941,7 +2962,7 @@ footer {
   color: #fff;
   padding: 13px 32px;
   border-radius: var(--radius-lg);
-  font-family: 'Bricolage Grotesque', sans-serif;
+  font-family: "Bricolage Grotesque", sans-serif;
   font-size: 15px;
   font-weight: 800;
   cursor: pointer;
@@ -2952,17 +2973,33 @@ footer {
   transition: background 0.15s;
 }
 
-.fp-back-btn:hover { background: #2200D4; }
+.fp-back-btn:hover {
+  background: #2200d4;
+}
 
 @keyframes fpRiseUp {
-  0%   { opacity: 0; transform: translateY(60px) scale(0.85); }
-  60%  { transform: translateY(-8px) scale(1.04); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.85);
+  }
+  60% {
+    transform: translateY(-8px) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes fpFadeDown {
-  from { opacity: 0; transform: translateY(-12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Confetti canvas */
@@ -2973,4 +3010,271 @@ footer {
   z-index: 999;
   width: 100%;
   height: 100%;
+}
+
+/* =============================================
+   FULL SCREEN GAME LAYOUT (no sidebar)
+   ============================================= */
+.fs-layout {
+  min-height: 100vh;
+  background: var(--midnight);
+  display: flex;
+  flex-direction: column;
+}
+
+.fs-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: #0f0f22;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.fs-question-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 48px 32px;
+  text-align: center;
+}
+
+.fs-question-text {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: clamp(24px, 4vw, 48px);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  max-width: 800px;
+  margin-bottom: 40px;
+}
+
+.fs-answers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+  max-width: 860px;
+}
+
+.fs-answers-grid .pg-ans-btn {
+  min-height: 88px;
+  font-size: 18px;
+  padding: 20px 28px;
+  border-radius: 18px;
+}
+
+.fs-answers-grid .pg-ans-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 20px;
+}
+
+/* =============================================
+   LEADERBOARD SCREEN
+   ============================================= */
+.lb-screen {
+  min-height: 100vh;
+  background: var(--midnight);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px 32px;
+  position: relative;
+}
+
+.lb-screen-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.lb-screen-title {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 6px;
+  animation: fadeIn 0.4s ease;
+}
+
+.lb-screen-sub {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.4);
+  animation: fadeIn 0.4s ease 0.1s both;
+}
+
+.lb-screen-list {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.lb-screen-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: background 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.lb-screen-row.visible {
+  animation: lbRowIn 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+.lb-screen-row.rank-1 {
+  background: rgba(255, 214, 0, 0.1);
+  border-color: rgba(255, 214, 0, 0.25);
+}
+.lb-screen-row.rank-2 {
+  background: rgba(192, 192, 192, 0.07);
+  border-color: rgba(192, 192, 192, 0.18);
+}
+.lb-screen-row.rank-3 {
+  background: rgba(205, 127, 50, 0.07);
+  border-color: rgba(205, 127, 50, 0.15);
+}
+.lb-screen-row.is-you {
+  border-color: rgba(0, 212, 255, 0.3);
+  background: rgba(0, 212, 255, 0.07);
+}
+
+.lb-screen-rank {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  width: 32px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.lb-screen-row.rank-1 .lb-screen-rank {
+  color: #ffd600;
+}
+.lb-screen-row.rank-2 .lb-screen-rank {
+  color: #c0c0c0;
+}
+.lb-screen-row.rank-3 .lb-screen-rank {
+  color: #cd7f32;
+}
+
+.lb-screen-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.lb-screen-name {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.lb-screen-score {
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+.lb-screen-row.rank-1 .lb-screen-score {
+  color: #ffd600;
+}
+
+.lb-screen-arrow {
+  font-size: 13px;
+  font-weight: 800;
+  min-width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.lb-screen-your {
+  width: 100%;
+  max-width: 560px;
+  margin-top: 20px;
+  padding: 14px 18px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.lb-screen-your-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.lb-screen-your-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lb-screen-your-num {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--cyan);
+  min-width: 40px;
+}
+
+.lb-screen-your-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.lb-screen-your-score {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+@keyframes lbRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .fs-answers-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .fs-question-area {
+    padding: 20px 16px;
+  }
+  .fs-question-text {
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+  .fs-answers-grid .pg-ans-btn {
+    min-height: 68px;
+    font-size: 15px;
+  }
 }

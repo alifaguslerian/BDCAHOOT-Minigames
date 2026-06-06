@@ -44,77 +44,70 @@
     <button class="btn btn-ghost btn-sm" style="margin-top:24px;" onclick="window.location.href='/'">Leave Room</button>
   </div>
 
-  <!-- GAME SCREEN -->
-  <div id="gameScreen" style="display:none;" class="pg-layout">
+  <!-- GAME SCREEN — full screen, no sidebar -->
+  <div id="gameScreen" style="display:none;" class="fs-layout">
 
-    <div class="pg-main">
-      <!-- Topbar: no room code, just progress + player count -->
-      <div class="pg-topbar">
-        <button class="pg-leave-btn" onclick="if(confirm('Leave game?'))window.location.href='/'">✕ Leave</button>
-        <div class="pg-progress-pill" id="qProgressDisplay">Q1 / ?</div>
-        <div class="pg-players-count">
-          <span>👥</span>
-          <span id="playerCountDisplay">—</span>
-        </div>
-      </div>
-
-      <!-- Question area -->
-      <div class="pg-question-area">
-
-        <!-- Timer -->
-        <div class="pg-timer-wrap">
-          <svg class="pg-timer-svg" viewBox="0 0 88 88">
-            <circle class="pg-timer-track" cx="44" cy="44" r="37" />
-            <circle class="pg-timer-prog" id="timerProgress" cx="44" cy="44" r="37" />
-          </svg>
-          <div class="pg-timer-num" id="timerNumber">—</div>
-        </div>
-
-        <!-- Question -->
-        <div class="pg-question-text" id="questionText">Get ready...</div>
-
-        <!-- Answers -->
-        <div class="pg-answers-grid" id="answersGrid">
-          <button class="pg-ans-btn" data-index="0">
-            <div class="pg-ans-icon" data-index="0">▲</div>
-            <span class="answer-text">—</span>
-          </button>
-          <button class="pg-ans-btn" data-index="1">
-            <div class="pg-ans-icon" data-index="1">◆</div>
-            <span class="answer-text">—</span>
-          </button>
-          <button class="pg-ans-btn" data-index="2">
-            <div class="pg-ans-icon" data-index="2">●</div>
-            <span class="answer-text">—</span>
-          </button>
-          <button class="pg-ans-btn" data-index="3">
-            <div class="pg-ans-icon" data-index="3">■</div>
-            <span class="answer-text">—</span>
-          </button>
-        </div>
-
+    <div class="fs-topbar">
+      <button class="pg-leave-btn" onclick="if(confirm('Leave game?'))window.location.href='/'">✕ Leave</button>
+      <div class="pg-progress-pill" id="qProgressDisplay">Q1 / ?</div>
+      <div class="pg-players-count">
+        <span>👥</span>
+        <span id="playerCountDisplay">—</span>
       </div>
     </div>
 
-    <!-- Sidebar -->
-    <div class="pg-sidebar">
-      <div class="pg-sb-head">
-        <h3>Live Ranks</h3>
-        <span>Top 5</span>
+    <div class="fs-question-area">
+      <div class="pg-timer-wrap">
+        <svg class="pg-timer-svg" viewBox="0 0 88 88">
+          <circle class="pg-timer-track" cx="44" cy="44" r="37" />
+          <circle class="pg-timer-prog" id="timerProgress" cx="44" cy="44" r="37" />
+        </svg>
+        <div class="pg-timer-num" id="timerNumber">—</div>
       </div>
-      <div class="leaderboard-list" id="leaderboardList"></div>
-      <div class="pg-your-rank">
-        <div class="pg-your-label">Your Rank</div>
-        <div class="pg-your-card">
-          <div class="pg-your-num" id="yourRankNum">—</div>
-          <div>
-            <div class="pg-your-name" id="yourRankName">You</div>
-            <div class="pg-your-score" id="yourRankScore">0 pts</div>
-          </div>
-        </div>
+
+      <div class="fs-question-text" id="questionText">Get ready...</div>
+
+      <div class="fs-answers-grid" id="answersGrid">
+        <button class="pg-ans-btn" data-index="0">
+          <div class="pg-ans-icon" data-index="0">▲</div>
+          <span class="answer-text">—</span>
+        </button>
+        <button class="pg-ans-btn" data-index="1">
+          <div class="pg-ans-icon" data-index="1">◆</div>
+          <span class="answer-text">—</span>
+        </button>
+        <button class="pg-ans-btn" data-index="2">
+          <div class="pg-ans-icon" data-index="2">●</div>
+          <span class="answer-text">—</span>
+        </button>
+        <button class="pg-ans-btn" data-index="3">
+          <div class="pg-ans-icon" data-index="3">■</div>
+          <span class="answer-text">—</span>
+        </button>
       </div>
     </div>
 
+  </div>
+
+  <!-- LEADERBOARD SCREEN -->
+  <div id="leaderboardScreen" style="display:none;" class="lb-screen">
+    <div class="lb-screen-header">
+      <div class="lb-screen-title">Leaderboard</div>
+      <div class="lb-screen-sub" id="lbScreenSub">After Q1</div>
+    </div>
+
+    <div class="lb-screen-list" id="lbScreenList"></div>
+
+    <div class="lb-screen-your">
+      <div class="lb-screen-your-label">Your Rank</div>
+      <div class="lb-screen-your-card">
+        <div class="lb-screen-your-num" id="lbYourRank">—</div>
+        <div>
+          <div class="lb-screen-your-name" id="lbYourName">You</div>
+          <div class="lb-screen-your-score" id="lbYourScore">0 pts</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- FEEDBACK OVERLAY -->

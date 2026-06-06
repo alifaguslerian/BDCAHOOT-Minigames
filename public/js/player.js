@@ -1,7 +1,6 @@
-// player.js — Player game logic
-
 const lobbyScreen = document.getElementById('lobbyScreen');
 const gameScreen = document.getElementById('gameScreen');
+const leaderboardScreen = document.getElementById('leaderboardScreen');
 const playerNameDisplay = document.getElementById('playerNameDisplay');
 const quizTitleDisplay = document.getElementById('quizTitleDisplay');
 const qProgressDisplay = document.getElementById('qProgressDisplay');
@@ -10,51 +9,45 @@ const questionText = document.getElementById('questionText');
 const answersGrid = document.getElementById('answersGrid');
 const timerNumber = document.getElementById('timerNumber');
 const timerProgress = document.getElementById('timerProgress');
-const leaderboardList = document.getElementById('leaderboardList');
-const yourRankNum = document.getElementById('yourRankNum');
-const yourRankName = document.getElementById('yourRankName');
-const yourRankScore = document.getElementById('yourRankScore');
 const feedbackOverlay = document.getElementById('feedbackOverlay');
 const feedbackIcon = document.getElementById('feedbackIcon');
 const feedbackLabel = document.getElementById('feedbackLabel');
 const feedbackPts = document.getElementById('feedbackPts');
+const lbScreenList = document.getElementById('lbScreenList');
+const lbScreenSub = document.getElementById('lbScreenSub');
+const lbYourRank = document.getElementById('lbYourRank');
+const lbYourName = document.getElementById('lbYourName');
+const lbYourScore = document.getElementById('lbYourScore');
 
 const playerName = sessionStorage.getItem('playerName') || 'Player';
 const roomCode = sessionStorage.getItem('roomCode') || '';
 const quizTitle = sessionStorage.getItem('quizTitle') || 'Quiz';
 
-// Guard: if no room code stored, redirect to home
 if (!roomCode) window.location.href = '/';
 
-// Set lobby info
 playerNameDisplay.textContent = playerName;
 quizTitleDisplay.textContent = quizTitle;
-yourRankName.textContent = playerName;
+lbYourName.textContent = playerName;
 
 let currentTimeLimit = 20;
 let hasAnswered = false;
+let currentQuestion = 0;
+let totalQuestions = 0;
+let prevRanks = {};
 
-// ---- Re-join if socket reconnects ----
+// ---- Reconnect ----
 window.socket.on('connect', () => {
   const code = sessionStorage.getItem('roomCode');
   const name = sessionStorage.getItem('playerName');
   const avatar = sessionStorage.getItem('playerAvatar');
   const avatarBg = sessionStorage.getItem('playerAvatarBg');
-
-  if (code && name) {
-    window.socket.emit('join-room', { code, playerName: name, avatar, avatarBg });
-  }
+  if (code && name) window.socket.emit('join-room', { code, playerName: name, avatar, avatarBg });
 });
 
 window.socket.on('room-joined', (data) => {
   sessionStorage.setItem('quizTitle', data.quizTitle);
-  if (!data.isReconnect) {
-    // Join baru — tetap di lobby
-  }
-  // Kalau reconnect, game-started akan dikirim server dan handle otomatis
 });
 
-// ---- Player list updates (lobby) ----
 window.socket.on('player-list-updated', (data) => {
   playerCountDisplay.textContent = data.count + ' Players';
 });
@@ -62,9 +55,7 @@ window.socket.on('player-list-updated', (data) => {
 // ---- Game started ----
 window.socket.on('game-started', () => {
   lobbyScreen.style.display = 'none';
-  gameScreen.style.display = 'grid';
-
-  // Kalau gameScreen sudah visible (reconnect), skip countdown
+  gameScreen.style.display = 'flex';
   if (gameScreen.dataset.started) return;
   gameScreen.dataset.started = 'true';
   startCountdown();
@@ -74,6 +65,12 @@ window.socket.on('game-started', () => {
 window.socket.on('question-started', (data) => {
   hasAnswered = false;
   currentTimeLimit = data.timeLimit;
+  currentQuestion = data.questionIndex + 1;
+  totalQuestions = data.totalQuestions;
+
+  // Switch ke game screen
+  leaderboardScreen.style.display = 'none';
+  gameScreen.style.display = 'flex';
 
   questionText.textContent = data.question;
   qProgressDisplay.textContent = `Q${data.questionIndex + 1} / ${data.totalQuestions}`;
@@ -82,14 +79,13 @@ window.socket.on('question-started', (data) => {
   timerProgress.classList.remove('urgent', 'critical');
   timerNumber.textContent = data.timeLimit;
 
-  // Reset buttons — rebuild innerHTML bersih tanpa distribusi
-  const btns = answersGrid.querySelectorAll('.pg-ans-btn');
+  // Reset buttons bersih
   const icons = ['▲', '◆', '●', '■'];
+  const btns = answersGrid.querySelectorAll('.pg-ans-btn');
   btns.forEach((btn, i) => {
     btn.disabled = false;
     btn.classList.remove('correct', 'wrong', 'selected');
     btn.style.opacity = '1';
-    // Rebuild HTML bersih — hapus semua jejak distribusi
     btn.innerHTML = `
       <div class="pg-ans-icon" data-index="${i}">${icons[i]}</div>
       <span class="answer-text">${data.options[i] || '—'}</span>
@@ -99,13 +95,12 @@ window.socket.on('question-started', (data) => {
   feedbackOverlay.classList.remove('show');
 });
 
-// ---- Timer update ----
+// ---- Timer ----
 window.socket.on('timer-update', (data) => {
   const timeLeft = data.timeLeft;
   timerNumber.textContent = timeLeft;
 
-  const progress = timeLeft / currentTimeLimit;
-  const offset = 232 * (1 - progress); // 232 = circumference baru (r=37)
+  const offset = 232 * (1 - timeLeft / currentTimeLimit);
   timerProgress.style.strokeDashoffset = offset;
 
   if (timeLeft <= 5 && timeLeft > 0) {
@@ -121,7 +116,6 @@ window.socket.on('timer-update', (data) => {
 
 // ---- Submit answer ----
 answersGrid.addEventListener('click', (e) => {
-
   const btn = e.target.closest('.pg-ans-btn');
   if (!btn || hasAnswered) return;
 
@@ -129,156 +123,115 @@ answersGrid.addEventListener('click', (e) => {
   hasAnswered = true;
   btn.classList.add('selected');
   lockAnswers(btn);
-
   window.socket.emit('submit-answer', { answerIndex });
 });
 
 function lockAnswers(selectedBtn = null) {
-  const btns = answersGrid.querySelectorAll('.pg-ans-btn');
-  btns.forEach(b => {
+  answersGrid.querySelectorAll('.pg-ans-btn').forEach(b => {
     b.disabled = true;
     if (b !== selectedBtn) b.style.opacity = '0.4';
   });
 }
 
-// Jawaban diterima server — tampilkan waiting state
+// ---- Answer received ----
 window.socket.on('answer-received', () => {
   feedbackIcon.textContent = '⏳';
   feedbackLabel.textContent = 'Answered!';
   feedbackLabel.style.color = 'var(--cyan)';
-  feedbackPts.textContent = 'Waiting for timer...';
+  feedbackPts.textContent = 'Waiting for results...';
   feedbackOverlay.classList.add('show');
 });
 
-// ---- Answer result ----
-// Timer habis — tampilkan hasil + leaderboard
+// ---- Answer result (timer habis) ----
 window.socket.on('answer-result', (data) => {
   feedbackOverlay.classList.remove('show');
+  void feedbackOverlay.offsetWidth;
 
-  setTimeout(() => {
-    if (data.correct) {
-      feedbackIcon.textContent = '✅';
-      feedbackLabel.textContent = 'Jawaban benar!';
-      feedbackLabel.style.color = 'var(--green)';
-      feedbackPts.textContent = `Dapat +${data.score.toLocaleString()} poin`;
-    } else {
-      feedbackIcon.textContent = '❌';
-      feedbackLabel.textContent = 'Jawaban salah';
-      feedbackLabel.style.color = '#FF5252';
-      feedbackPts.textContent = 'Dapat 0 poin';
-    }
+  if (data.correct) {
+    feedbackIcon.textContent = '✅';
+    feedbackLabel.textContent = 'Jawaban benar!';
+    feedbackLabel.style.color = 'var(--green)';
+    feedbackPts.textContent = `+${data.score.toLocaleString()} poin`;
+  } else {
+    feedbackIcon.textContent = '❌';
+    feedbackLabel.textContent = 'Jawaban salah';
+    feedbackLabel.style.color = '#FF5252';
+    feedbackPts.textContent = '0 poin';
+  }
 
-    yourRankScore.textContent = data.totalScore.toLocaleString() + ' pts';
-    feedbackOverlay.classList.add('show');
-
-    // Tidak auto-hide — round-end yang akan hide ini
-  }, 300);
+  lbYourScore.textContent = data.totalScore.toLocaleString() + ' pts';
+  feedbackOverlay.classList.add('show');
 });
 
-// Round end — update leaderboard + distribusi jawaban
+// ---- Round end → switch ke leaderboard screen ----
 window.socket.on('round-end', (data) => {
-  setTimeout(() => { feedbackOverlay.classList.remove('show'); }, 1800);
+  // Hide feedback
+  feedbackOverlay.classList.remove('show');
 
+  // Reveal jawaban benar dulu sebentar
   const btns = answersGrid.querySelectorAll('.pg-ans-btn');
   btns.forEach((btn, i) => {
     btn.disabled = true;
-    const count = data.distribution[i] || 0;
-    const pct   = Math.round((count / Math.max(data.totalPlayers, 1)) * 100);
-
     if (i === data.correctAnswer) {
       btn.classList.add('correct');
       btn.style.opacity = '1';
     } else {
       btn.classList.add('wrong');
-      btn.style.opacity = '0.4';
-    }
-
-    const textEl = btn.querySelector('.answer-text');
-    const iconEl = btn.querySelector('.pg-ans-icon');
-    if (textEl && iconEl) {
-      btn.innerHTML = `
-        <div class="pg-ans-icon" data-index="${i}">${iconEl.textContent}</div>
-        <span class="answer-text">${textEl.textContent}</span>
-        <div class="answer-dist" style="margin-left:auto;">
-          <div class="answer-dist-bar" style="width:${pct}%"></div>
-          <span class="answer-dist-label">${count}</span>
-        </div>
-      `;
+      btn.style.opacity = '0.35';
     }
   });
 
-  renderLeaderboard(data.leaderboard);
+  // Transisi ke leaderboard screen setelah 1.5 detik
+  setTimeout(() => {
+    gameScreen.style.display = 'none';
+    leaderboardScreen.style.display = 'flex';
+    lbScreenSub.textContent = `After Q${currentQuestion} of ${totalQuestions}`;
+    renderLbScreen(data.leaderboard);
+  }, 1500);
 });
 
-let prevRanks = {};
-
-function renderLeaderboard(board) {
+// ---- Render leaderboard screen ----
+function renderLbScreen(board) {
   const myAvatar = sessionStorage.getItem('playerAvatar') || '🎮';
   const myAvatarBg = sessionStorage.getItem('playerAvatarBg') || '#1A2A6C';
-  const top5 = board.slice(0, 5);
+  const top10 = board.slice(0, 10);
   const myEntry = board.find(p => p.name === playerName);
-  const ROW_H = 52;
 
-  leaderboardList.style.position = 'relative';
-  leaderboardList.style.height = (top5.length * ROW_H) + 'px';
-
-  top5.forEach((p, i) => {
+  lbScreenList.innerHTML = top10.map((p, i) => {
     const isMe = p.name === playerName;
     const emoji = isMe ? myAvatar : (p.avatar || p.name.substring(0, 2).toUpperCase());
     const bg = isMe ? myAvatarBg : (p.avatarBg || '#1A2A6C');
     const prev = prevRanks[p.name];
     const moved = prev !== undefined ? prev - p.rank : 0;
-    const arrowIcon = moved > 0 ? '↑' : moved < 0 ? '↓' : '—';
+    const arrow = moved > 0 ? '↑' : moved < 0 ? '↓' : '—';
     const arrowColor = moved > 0 ? '#00E676' : moved < 0 ? '#FF5252' : 'rgba(255,255,255,0.2)';
-    const topClass = p.rank === 1 ? 'top-3' : p.rank <= 3 ? 'top-3' : '';
+    const rankClass = p.rank === 1 ? 'rank-1' : p.rank === 2 ? 'rank-2' : p.rank === 3 ? 'rank-3' : '';
 
-    let row = document.getElementById('lb-row-' + p.name.replace(/\s/g, '_'));
-
-    if (!row) {
-      row = document.createElement('div');
-      row.id = 'lb-row-' + p.name.replace(/\s/g, '_');
-      row.className = `lb-item ${topClass} ${isMe ? 'is-you' : ''}`;
-      row.style.cssText = `
-        position:absolute;left:0;width:100%;
-        transition:top 0.5s cubic-bezier(0.34,1.4,0.64,1), background 0.3s ease;
-      `;
-      leaderboardList.appendChild(row);
-    }
-
-    // Animasi naik/turun
-    row.style.top = (i * ROW_H) + 'px';
-    row.className = `lb-item ${topClass} ${isMe ? 'is-you' : ''}`;
-
-    // Flash hijau kalau naik rank
-    if (moved > 0) {
-      row.style.background = 'rgba(0,230,118,0.15)';
-      setTimeout(() => { row.style.background = ''; }, 800);
-    } else if (moved < 0) {
-      row.style.background = 'rgba(255,82,82,0.08)';
-      setTimeout(() => { row.style.background = ''; }, 800);
-    }
-
-    row.innerHTML = `
-      <div class="lb-rank">${p.rank}</div>
-      <div class="lb-avatar" style="background:${bg};font-size:14px;">${emoji}</div>
-      <div class="lb-name">${p.name}${isMe ? ' (You)' : ''}</div>
-      <div class="lb-score">${p.score.toLocaleString()}</div>
-      <span style="font-size:11px;font-weight:800;color:${arrowColor};margin-left:2px;min-width:14px;text-align:center;">${arrowIcon}</span>
+    return `
+      <div class="lb-screen-row ${rankClass} ${isMe ? 'is-you' : ''}"
+           style="animation-delay:${i * 0.07}s">
+        <div class="lb-screen-rank">${p.rank}</div>
+        <div class="lb-screen-avatar" style="background:${bg}">${emoji}</div>
+        <div class="lb-screen-name">${p.name}${isMe ? ' (You)' : ''}</div>
+        <div class="lb-screen-score">${p.score.toLocaleString()}</div>
+        <div class="lb-screen-arrow" style="color:${arrowColor}">${arrow}</div>
+      </div>
     `;
-  });
+  }).join('');
 
-  // Hapus row yang sudah tidak di top5
-  const top5Names = top5.map(p => 'lb-row-' + p.name.replace(/\s/g, '_'));
-  leaderboardList.querySelectorAll('.lb-item').forEach(el => {
-    if (!top5Names.includes(el.id)) el.remove();
+  // Trigger animasi masuk
+  requestAnimationFrame(() => {
+    lbScreenList.querySelectorAll('.lb-screen-row').forEach(row => {
+      row.classList.add('visible');
+    });
   });
 
   // Update prevRanks
   board.forEach(p => { prevRanks[p.name] = p.rank; });
 
   if (myEntry) {
-    yourRankNum.textContent = '#' + myEntry.rank;
-    yourRankScore.textContent = myEntry.score.toLocaleString() + ' pts';
+    lbYourRank.textContent = '#' + myEntry.rank;
+    lbYourScore.textContent = myEntry.score.toLocaleString() + ' pts';
   }
 }
 
@@ -289,7 +242,6 @@ window.socket.on('game-finished', (data) => {
   window.location.href = '/final-podium.html';
 });
 
-// ---- Host left ----
 window.socket.on('host-left', () => {
   alert('The host ended the game.');
   window.location.href = '/';
