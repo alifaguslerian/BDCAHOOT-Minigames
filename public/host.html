@@ -50,7 +50,7 @@
       <div class="room-code-label">Room Code — Share this with players</div>
       <div class="room-code-value" id="displayRoomCode">------</div>
       <p style="margin-top:10px;color:rgba(255,255,255,0.5);font-size:13px;">
-        
+
       </p>
     </div>
 
@@ -70,6 +70,15 @@
       </button>
       <button class="btn btn-ghost" id="endHostBtn">✕ Close Room</button>
     </div>
+  </div>
+
+  <!-- LEADERBOARD SCREEN HOST -->
+  <div id="hostLbScreen" style="display:none;" class="lb-screen">
+    <div class="lb-screen-header">
+      <div class="lb-screen-title">Leaderboard</div>
+      <div class="lb-screen-sub" id="hostLbSub">After Q1</div>
+    </div>
+    <div class="lb-screen-list" id="hostLbList"></div>
   </div>
 
   <!-- GAME SCREEN — full display mode -->
@@ -153,6 +162,8 @@
       <div class="hd-lb-list" id="hdLeaderboard"></div>
       <button class="hd-end-btn" id="endGameBtn">End Game</button>
     </div>
+
+
 
   </div>
   <!-- COUNTDOWN OVERLAY -->
