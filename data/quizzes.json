@@ -5,15 +5,25 @@
     "questions": [
       {
         "question": "What is the capital city of Indonesia?",
-        "options": ["Jakarta", "Bandung", "Surabaya", "Medan"],
+        "options": [
+          "Jakarta",
+          "Bandung",
+          "Surabaya",
+          "Medan"
+        ],
         "correctAnswer": 0,
-        "timeLimit": 20
+        "timeLimit": 10
       },
       {
         "question": "Which programming language is known as the language of the web?",
-        "options": ["Python", "Java", "JavaScript", "C++"],
+        "options": [
+          "Python",
+          "Java",
+          "JavaScript",
+          "C++"
+        ],
         "correctAnswer": 2,
-        "timeLimit": 15
+        "timeLimit": 10
       },
       {
         "question": "What does HTML stand for?",
@@ -24,7 +34,7 @@
           "Home Tool Markup Language"
         ],
         "correctAnswer": 0,
-        "timeLimit": 20
+        "timeLimit": 10
       }
     ]
   }

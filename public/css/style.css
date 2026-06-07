@@ -2609,11 +2609,13 @@ footer {
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 100;
+  z-index: 500;
   animation: slideUp 0.4s ease;
 }
 
 .hd-next-float button {
+  position: relative;
+  z-index: 501;
   background: #00e676;
   border: none;
   color: #000;

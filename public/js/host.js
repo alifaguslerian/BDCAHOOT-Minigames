@@ -17,6 +17,8 @@ const hdQProgress = document.getElementById('hdQProgress');
 const hdAnsweredCount = document.getElementById('hdAnsweredCount');
 const hdTotalPlayers = document.getElementById('hdTotalPlayers');
 const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+const nextFloatBtn = document.getElementById('nextFloatBtn');
+const nextFloatBtnAction = nextFloatBtn.querySelector('button');
 const hdTimerProg = document.getElementById('hdTimerProg');
 const hdTimerNum = document.getElementById('hdTimerNum');
 const hdQuestion = document.getElementById('hdQuestion');
@@ -182,31 +184,63 @@ window.socket.on('round-end', (data) => {
 
   // Switch ke leaderboard screen setelah 2 detik
   setTimeout(() => {
+    if (data.isLastQuestion) {
+      // Soal terakhir — skip leaderboard, langsung tampil waiting + tombol lihat hasil
+      gameScreen.style.display = 'none';
+      hostLbScreen.style.display = 'none';
+
+      nextFloatBtn.dataset.mode = 'finish';
+      nextFloatBtn.style.display = 'block';
+      nextFloatBtnAction.textContent = 'Lihat Hasil 🏆';
+      nextFloatBtnAction.style.background = '#FFD600';
+      nextFloatBtnAction.style.color = '#000';
+      nextFloatBtnAction.style.fontSize = '18px';
+      nextFloatBtnAction.style.padding = '18px 52px';
+
+      // Tampilkan waiting screen di host
+      if (!document.getElementById('hostWaitingFinal')) {
+        const waitingOverlay = document.createElement('div');
+        waitingOverlay.id = 'hostWaitingFinal';
+        waitingOverlay.style.position = 'fixed';
+        waitingOverlay.style.inset = '0';
+        waitingOverlay.style.background = '#0A0A1A';
+        waitingOverlay.style.display = 'flex';
+        waitingOverlay.style.flexDirection = 'column';
+        waitingOverlay.style.alignItems = 'center';
+        waitingOverlay.style.justifyContent = 'center';
+        waitingOverlay.style.zIndex = '400';
+        waitingOverlay.style.fontFamily = "'Bricolage Grotesque',sans-serif";
+        waitingOverlay.style.textAlign = 'center';
+        waitingOverlay.innerHTML = `
+          <div style="font-size:64px;margin-bottom:24px;">🏆</div>
+          <div style="font-size:40px;font-weight:800;color:#fff;margin-bottom:12px;">Game Selesai!</div>
+          <div style="font-size:16px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Semua soal sudah dijawab</div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.25);">Klik tombol di bawah untuk lihat hasil</div>
+        `;
+        document.body.appendChild(waitingOverlay);
+      }
+
+      nextQuestionBtn.disabled = false;
+      return;
+    }
+
+    // Bukan soal terakhir — ke leaderboard screen
     gameScreen.style.display = 'none';
     hostLbScreen.style.display = 'flex';
 
     const currentQ = hdQProgress.textContent;
     hostLbSub.textContent = `After ${currentQ}`;
-
     renderHostLbScreen(data.leaderboard);
 
     nextQuestionBtn.disabled = false;
-    document.getElementById('nextFloatBtn').style.display = 'block';
+    nextFloatBtn.dataset.mode = 'next';
+    nextFloatBtn.style.display = 'block';
 
-    const floatBtn = document.querySelector('#nextFloatBtn button');
-    if (data.isLastQuestion) {
-      floatBtn.textContent = 'Lihat Hasil 🏆';
-      floatBtn.style.background = '#FFD600';
-      floatBtn.style.color = '#000';
-      floatBtn.style.fontSize = '18px';
-      floatBtn.style.padding = '18px 52px';
-    } else {
-      floatBtn.textContent = 'Next Question →';
-      floatBtn.style.background = '';
-      floatBtn.style.color = '';
-      floatBtn.style.fontSize = '';
-      floatBtn.style.padding = '';
-    }
+    nextFloatBtnAction.textContent = 'Next Question →';
+    nextFloatBtnAction.style.background = '';
+    nextFloatBtnAction.style.color = '';
+    nextFloatBtnAction.style.fontSize = '';
+    nextFloatBtnAction.style.padding = '';
   }, 2000);
 });
 
@@ -248,11 +282,43 @@ nextQuestionBtn.addEventListener('click', () => {
   nextQuestionBtn.disabled = true;
   document.getElementById('nextFloatBtn').style.display = 'none';
 
-  // Switch balik ke game screen
+  // Hapus waiting screen kalau ada
+  const waiting = document.getElementById('hostWaitingFinal');
+  if (waiting) waiting.remove();
+
   hostLbScreen.style.display = 'none';
   gameScreen.style.display = 'grid';
 
-  // Reset answer cards
+  const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');
+  cards.forEach(c => {
+    c.classList.remove('correct', 'wrong');
+    c.style.opacity = '1';
+    const dist = c.querySelector('.hd-dist-wrap');
+    if (dist) dist.style.display = 'none';
+    const fill = c.querySelector('.hd-dist-fill');
+    if (fill) fill.style.width = '0%';
+  });
+});
+
+nextFloatBtnAction.addEventListener('click', () => {
+  const mode = nextFloatBtn.dataset.mode;
+  if (mode === 'finish') {
+    window.socket.emit('end-game');
+    nextFloatBtn.style.display = 'none';
+    nextQuestionBtn.disabled = true;
+    return;
+  }
+
+  window.socket.emit('next-question');
+  nextQuestionBtn.disabled = true;
+  nextFloatBtn.style.display = 'none';
+
+  const waiting = document.getElementById('hostWaitingFinal');
+  if (waiting) waiting.remove();
+
+  hostLbScreen.style.display = 'none';
+  gameScreen.style.display = 'grid';
+
   const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');
   cards.forEach(c => {
     c.classList.remove('correct', 'wrong');
