@@ -165,10 +165,8 @@ window.socket.on('answer-result', (data) => {
 
 // ---- Round end → switch ke leaderboard screen ----
 window.socket.on('round-end', (data) => {
-  // Hide feedback
   feedbackOverlay.classList.remove('show');
 
-  // Reveal jawaban benar dulu sebentar
   const btns = answersGrid.querySelectorAll('.pg-ans-btn');
   btns.forEach((btn, i) => {
     btn.disabled = true;
@@ -181,11 +179,31 @@ window.socket.on('round-end', (data) => {
     }
   });
 
-  // Transisi ke leaderboard screen setelah 1.5 detik
+  if (data.isLastQuestion) {
+    // Soal terakhir — skip leaderboard, langsung tunggu game-finished
+    setTimeout(() => {
+      gameScreen.style.display = 'none';
+      // Tampilkan loading screen sementara nunggu host klik lihat hasil
+      document.body.innerHTML += `
+        <div id="waitingFinal" style="
+          position:fixed;inset:0;background:#0A0A1A;
+          display:flex;flex-direction:column;align-items:center;justify-content:center;
+          z-index:500;font-family:'Bricolage Grotesque',sans-serif;
+        ">
+          <div style="font-size:48px;margin-bottom:20px;">🏆</div>
+          <div style="font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;">Game Over!</div>
+          <div style="font-size:15px;color:rgba(255,255,255,0.4);">Waiting for final results...</div>
+        </div>
+      `;
+    }, 1500);
+    return;
+  }
+
+  // Bukan soal terakhir — transisi ke leaderboard screen
   setTimeout(() => {
-    gameScreen.style.display = 'none';
+    gameScreen.style.display        = 'none';
     leaderboardScreen.style.display = 'flex';
-    lbScreenSub.textContent = `After Q${currentQuestion} of ${totalQuestions}`;
+    lbScreenSub.textContent         = `After Q${currentQuestion} of ${totalQuestions}`;
     renderLbScreen(data.leaderboard);
   }, 1500);
 });

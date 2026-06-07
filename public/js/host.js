@@ -23,8 +23,8 @@ const hdQuestion = document.getElementById('hdQuestion');
 const hdAnswersGrid = document.getElementById('hdAnswersGrid');
 const endGameBtn = document.getElementById('endGameBtn');
 const hostLbScreen = document.getElementById('hostLbScreen');
-const hostLbList   = document.getElementById('hostLbList');
-const hostLbSub    = document.getElementById('hostLbSub');
+const hostLbList = document.getElementById('hostLbList');
+const hostLbSub = document.getElementById('hostLbSub');
 
 let currentQuiz = null;
 let totalPlayers = 0;
@@ -163,7 +163,7 @@ window.socket.on('round-end', (data) => {
   const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');
   cards.forEach((card, i) => {
     const count = data.distribution[i] || 0;
-    const pct   = Math.round((count / Math.max(data.totalPlayers, 1)) * 100);
+    const pct = Math.round((count / Math.max(data.totalPlayers, 1)) * 100);
 
     if (i === data.correctAnswer) {
       card.classList.add('correct');
@@ -171,41 +171,41 @@ window.socket.on('round-end', (data) => {
       card.classList.add('wrong');
     }
 
-    const dist    = card.querySelector('.hd-dist-wrap');
-    const fill    = card.querySelector('.hd-dist-fill');
+    const dist = card.querySelector('.hd-dist-wrap');
+    const fill = card.querySelector('.hd-dist-fill');
     const countEl = card.querySelector('.hd-dist-count');
 
-    dist.style.display  = 'block';
+    dist.style.display = 'block';
     countEl.textContent = count;
     setTimeout(() => { fill.style.width = pct + '%'; }, 50);
   });
 
   // Switch ke leaderboard screen setelah 2 detik
   setTimeout(() => {
-    gameScreen.style.display    = 'none';
-    hostLbScreen.style.display  = 'flex';
+    gameScreen.style.display = 'none';
+    hostLbScreen.style.display = 'flex';
 
-    const currentQ = hdQProgress.textContent; // e.g. "Q3 / 10"
+    const currentQ = hdQProgress.textContent;
     hostLbSub.textContent = `After ${currentQ}`;
 
     renderHostLbScreen(data.leaderboard);
 
-    // Enable next button
     nextQuestionBtn.disabled = false;
     document.getElementById('nextFloatBtn').style.display = 'block';
 
-    // Update label tombol kalau soal terakhir
-    const qNum   = parseInt(hdQProgress.textContent.split('/')[0].replace('Q','').trim());
-    const qTotal = parseInt(hdQProgress.textContent.split('/')[1].trim());
     const floatBtn = document.querySelector('#nextFloatBtn button');
-    if (qNum >= qTotal) {
-      floatBtn.textContent      = 'Lihat Hasil 🏆';
+    if (data.isLastQuestion) {
+      floatBtn.textContent = 'Lihat Hasil 🏆';
       floatBtn.style.background = '#FFD600';
-      floatBtn.style.color      = '#000';
+      floatBtn.style.color = '#000';
+      floatBtn.style.fontSize = '18px';
+      floatBtn.style.padding = '18px 52px';
     } else {
-      floatBtn.textContent      = 'Next Question →';
+      floatBtn.textContent = 'Next Question →';
       floatBtn.style.background = '';
-      floatBtn.style.color      = '';
+      floatBtn.style.color = '';
+      floatBtn.style.fontSize = '';
+      floatBtn.style.padding = '';
     }
   }, 2000);
 });
@@ -221,9 +221,9 @@ function renderLeaderboard(board) {
 
 function renderHostLbScreen(board) {
   hostLbList.innerHTML = board.slice(0, 10).map((p, i) => {
-    const rankClass  = p.rank === 1 ? 'rank-1' : p.rank === 2 ? 'rank-2' : p.rank === 3 ? 'rank-3' : '';
-    const emoji      = p.avatar   || p.name.substring(0,2).toUpperCase();
-    const bg         = p.avatarBg || '#1A2A6C';
+    const rankClass = p.rank === 1 ? 'rank-1' : p.rank === 2 ? 'rank-2' : p.rank === 3 ? 'rank-3' : '';
+    const emoji = p.avatar || p.name.substring(0, 2).toUpperCase();
+    const bg = p.avatarBg || '#1A2A6C';
 
     return `
       <div class="lb-screen-row ${rankClass}" style="animation-delay:${i * 0.07}s">
@@ -250,7 +250,7 @@ nextQuestionBtn.addEventListener('click', () => {
 
   // Switch balik ke game screen
   hostLbScreen.style.display = 'none';
-  gameScreen.style.display   = 'grid';
+  gameScreen.style.display = 'grid';
 
   // Reset answer cards
   const cards = hdAnswersGrid.querySelectorAll('.hd-ans-card');

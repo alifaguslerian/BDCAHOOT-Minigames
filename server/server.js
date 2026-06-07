@@ -210,7 +210,7 @@ io.on('connection', (socket) => {
       sendNextQuestion(room);
     }
   });
-  
+
   // ----- PLAYER: Submit Answer -----
   socket.on('submit-answer', ({ answerIndex }) => {
     const room = roomManager.findRoomBySocket(socket.id);
@@ -347,11 +347,14 @@ function revealAndLeaderboard(room) {
 
   // Kirim round-end setelah 2.5 detik — state sudah 'reviewing' dari atas
   setTimeout(() => {
+    const isLastQuestion = room.currentQuestionIndex >= room.quiz.questions.length - 1;
+
     io.to(room.code).emit('round-end', {
       correctAnswer: question.correctAnswer,
       distribution,
       totalPlayers: room.players.size,
-      leaderboard
+      leaderboard,
+      isLastQuestion
     });
   }, 2500);
 }
