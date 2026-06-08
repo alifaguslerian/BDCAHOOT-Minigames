@@ -94,13 +94,13 @@ window.socket.on('player-list-updated', (data) => {
   startGameBtn.disabled = data.count === 0;
 
   playerListEl.innerHTML = data.players.map(p => `
-    <div class="player-item animate-in">
-      <div class="player-avatar" style="background:${p.avatarBg || '#1A2A6C'};font-size:16px;">
-        ${p.avatar || p.name.substring(0, 2).toUpperCase()}
-      </div>
-      <span style="font-weight:600;font-size:14px;">${p.name}</span>
+  <div class="player-grid-item animate-in">
+    <div class="player-grid-avatar" style="background:${p.avatarBg || '#1A2A6C'};">
+      ${p.avatar || p.name.substring(0, 2).toUpperCase()}
     </div>
-  `).join('');
+    <div class="player-grid-name">${p.name}</div>
+  </div>
+`).join('');
 });
 
 // ---- Start game ----
