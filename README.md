@@ -1,4 +1,4 @@
-# BDCAHOOT 🎮
+# BDCAHOOT 
 
 Realtime multiplayer quiz platform for student communities and events.
 
