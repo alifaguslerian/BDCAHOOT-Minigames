@@ -108,6 +108,12 @@ io.on('connection', (socket) => {
 
   // ----- PLAYER: Join Room -----
   socket.on('join-room', ({ code, playerName, avatar, avatarBg }) => {
+    const cleanName = playerName.trim().replace(/\s+/g, ' ');
+    if (!cleanName) {
+      socket.emit('join-error', { message: 'Please enter a valid name.' });
+      return;
+    }
+
     const room = roomManager.getRoom(code);
 
     if (!room) {
@@ -121,7 +127,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    const result = roomManager.addPlayer(code, socket.id, playerName, avatar, avatarBg);
+    const result = roomManager.addPlayer(code, socket.id, cleanName, avatar, avatarBg);
     if (!result) {
       socket.emit('join-error', { message: 'Name already taken. Choose another name.' });
       return;
@@ -381,4 +387,15 @@ initDB().then(() => {
 }).catch(err => {
   console.error('[DB] Failed to init:', err);
   process.exit(1);
+});
+
+// Auth check
+app.post('/api/auth', (req, res) => {
+  const { password } = req.body;
+  const correct = process.env.HOST_PASSWORD || 'bdca2026';
+  if (password === correct) {
+    res.json({ success: true });
+  } else {
+    res.status(401).json({ success: false, message: 'Wrong password' });
+  }
 });

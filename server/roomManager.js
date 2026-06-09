@@ -31,11 +31,13 @@ function addPlayer(code, socketId, playerName, avatar, avatarBg) {
   const room = getRoom(code);
   if (!room) return null;
 
-  // Cek apakah nama ini sudah ada — kalau ada dan disconnected, ini adalah reconnect
+  const normalizedNew = playerName.trim().replace(/\s+/g, ' ').toLowerCase();
+
   for (const [existingSocketId, player] of room.players) {
-    if (player.name.toLowerCase() === playerName.toLowerCase()) {
+    const normalizedExisting = player.name.trim().replace(/\s+/g, ' ').toLowerCase();
+    if (normalizedExisting === normalizedNew) {
       if (player.disconnected) {
-        // Reconnect — update socket ID, clear disconnect timer
+        // reconnect flow — sama seperti sebelumnya
         if (player.disconnectTimer) {
           clearTimeout(player.disconnectTimer);
           player.disconnectTimer = null;
@@ -44,24 +46,19 @@ function addPlayer(code, socketId, playerName, avatar, avatarBg) {
         player.id = socketId;
         player.disconnected = false;
         room.players.set(socketId, player);
-
-        // Update answeredThisRound kalau socket lama ada di sana
         if (room.answeredThisRound.has(existingSocketId)) {
           room.answeredThisRound.delete(existingSocketId);
           room.answeredThisRound.add(socketId);
         }
-
         return { player, isReconnect: true };
       }
-      // Nama sama tapi masih connected — tolak
       return null;
     }
   }
 
-  // Player baru
   const player = {
     id: socketId,
-    name: playerName,
+    name: playerName.trim().replace(/\s+/g, ' '), // simpan nama yang sudah clean
     avatar: avatar || '🎮',
     avatarBg: avatarBg || '#1A2A6C',
     score: 0,

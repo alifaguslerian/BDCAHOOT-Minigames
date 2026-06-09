@@ -1,3 +1,8 @@
+// Cek auth dulu
+requireAuth(() => {
+  // Semua kode host.js yang ada dipindah ke dalam sini
+
+
 const setupScreen = document.getElementById('setupScreen');
 const lobbyScreen = document.getElementById('lobbyScreen');
 const gameScreen = document.getElementById('gameScreen');
@@ -352,4 +357,4 @@ window.socket.on('game-finished', (data) => {
   sessionStorage.setItem('isHost', 'true');
   window.location.href = '/final-podium.html';
 });
-
+});
