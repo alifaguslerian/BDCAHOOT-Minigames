@@ -3326,3 +3326,15 @@ footer {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.qp-card-body {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 4px;
+  animation: fadeIn 0.2s ease;
+}
+
+.qp-toggle-btn {
+  font-size: 11px;
+  transition: transform 0.2s ease;
+}

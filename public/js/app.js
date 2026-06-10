@@ -92,6 +92,14 @@ roomCodeInput.addEventListener('input', () => {
   roomCodeInput.value = roomCodeInput.value.toUpperCase();
 });
 
+playerNameInput.addEventListener('keydown', (e) => {
+  if (e.key === ' ') e.preventDefault();
+});
+
+playerNameInput.addEventListener('input', () => {
+  playerNameInput.value = playerNameInput.value.replace(/\s/g, '');
+});
+
 // ---- Submit join ----
 joinSubmitBtn.addEventListener('click', submitJoin);
 roomCodeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitJoin(); });
@@ -111,6 +119,11 @@ function submitJoin() {
   }
   if (!name) {
     playerNameError.textContent = 'Please enter your name.';
+    playerNameError.classList.add('show');
+    valid = false;
+  }
+  if (name.includes(' ')) {
+    playerNameError.textContent = 'Name cannot contain spaces.';
     playerNameError.classList.add('show');
     valid = false;
   }

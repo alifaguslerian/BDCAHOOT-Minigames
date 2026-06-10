@@ -41,25 +41,37 @@ function avgTime() {
 function renderQuestions() {
     questionList.innerHTML = quiz.questions.map((q, i) => `
     <div class="qp-card" id="qcard-${i}">
-      <div class="qp-card-top">
+      <div class="qp-card-top" onclick="toggleQuestion(${i})" style="cursor:pointer;">
         <div class="qp-card-num">Q${i + 1}</div>
         <div class="qp-card-q">${escHtml(q.question)}</div>
-        <div class="qp-card-btns">
+        <div class="qp-card-btns" onclick="event.stopPropagation()">
           <button class="qp-icon-btn" onclick="openEdit(${i})" title="Edit">✏️</button>
           <button class="qp-icon-btn del" onclick="deleteQuestion(${i})" title="Delete">🗑</button>
+          <button class="qp-icon-btn qp-toggle-btn" id="toggle-${i}" title="Show/Hide">▼</button>
         </div>
       </div>
-      <div class="qp-opts">
-        ${q.options.map((opt, oi) => `
-          <div class="qp-opt ${oi === q.correctAnswer ? 'correct' : ''}">
-            <div class="qp-opt-dot"></div>
-            <span>${escHtml(opt)}</span>
-          </div>
-        `).join('')}
+      <div class="qp-card-body" id="qbody-${i}" style="display:none;">
+        <div class="qp-opts">
+          ${q.options.map((opt, oi) => `
+            <div class="qp-opt ${oi === q.correctAnswer ? 'correct' : ''}">
+              <div class="qp-opt-dot"></div>
+              <span>${escHtml(opt)}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="qp-timer">⏱ ${q.timeLimit}s</div>
       </div>
-      <div class="qp-timer">⏱ ${q.timeLimit}s</div>
     </div>
   `).join('');
+}
+
+function toggleQuestion(i) {
+    const body = document.getElementById(`qbody-${i}`);
+    const toggle = document.getElementById(`toggle-${i}`);
+    const isOpen = body.style.display !== 'none';
+
+    body.style.display = isOpen ? 'none' : 'block';
+    toggle.textContent = isOpen ? '▼' : '▲';
 }
 
 function escHtml(str) {
@@ -155,6 +167,8 @@ async function saveQuiz() {
     });
 }
 
+
+
 // ---- Start game ----
 function startGame() {
     if (quiz.questions.length === 0) {
@@ -165,6 +179,19 @@ function startGame() {
     sessionStorage.setItem('selectedQuizId', quizId);
     sessionStorage.setItem('selectedQuizTitle', quiz.title);
     window.location.href = '/host.html?start=' + quizId;
+}
+
+let allExpanded = false;
+
+function toggleAll() {
+    allExpanded = !allExpanded;
+    quiz.questions.forEach((_, i) => {
+        const body = document.getElementById(`qbody-${i}`);
+        const toggle = document.getElementById(`toggle-${i}`);
+        if (body) body.style.display = allExpanded ? 'block' : 'none';
+        if (toggle) toggle.textContent = allExpanded ? '▲' : '▼';
+    });
+    document.getElementById('toggleAllBtn').textContent = allExpanded ? '🙈 Hide All' : '👁 Show All';
 }
 
 document.getElementById('startGameBtn').addEventListener('click', startGame);
