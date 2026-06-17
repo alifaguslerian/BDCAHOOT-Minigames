@@ -4,37 +4,304 @@
     "title": "General Knowledge",
     "questions": [
       {
-        "question": "What is the capital city of Indonesia?",
         "options": [
-          "Jakarta",
-          "Bandung",
-          "Surabaya",
-          "Medan"
+          "Sistem enkripsi data",
+          "Mekanisme yang menentukan hak akses pengguna",
+          "Sistem backup data",
+          "Firewall jaringan"
         ],
-        "correctAnswer": 0,
-        "timeLimit": 10
+        "question": "Apa yang dimaksud dengan Access Control?",
+        "timeLimit": 30,
+        "correctAnswer": 1
       },
       {
-        "question": "Which programming language is known as the language of the web?",
         "options": [
-          "Python",
-          "Java",
-          "JavaScript",
-          "C++"
+          "Server mati",
+          "Password terlalu lemah",
+          "Aplikasi gagal membatasi akses sesuai hak pengguna",
+          "Database penuh"
         ],
-        "correctAnswer": 2,
-        "timeLimit": 10
+        "question": "Broken Access Control terjadi ketika...",
+        "timeLimit": 20,
+        "correctAnswer": 2
       },
       {
-        "question": "What does HTML stand for?",
         "options": [
-          "Hyper Text Markup Language",
-          "High Tech Modern Language",
-          "Hyper Transfer Markup Logic",
-          "Home Tool Markup Language"
+          "Kebocoran data pengguna",
+          "Monitor rusak",
+          "Printer tidak berfungsi",
+          "Harddisk penuh"
         ],
-        "correctAnswer": 0,
-        "timeLimit": 10
+        "question": "Manakah yang termasuk dampak Broken Access Control?",
+        "timeLimit": 20,
+        "correctAnswer": 0
+      },
+      {
+        "options": ["Response", "Request", "Session", "Cookie"],
+        "question": "Dalam proses kerja website, browser mengirimkan...",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": ["Request", "Query", "Response", "Login"],
+        "question": "Server akan mengirimkan kembali kepada browser berupa...",
+        "timeLimit": 20,
+        "correctAnswer": 2
+      },
+      {
+        "options": [
+          "Membuat website",
+          "Melihat dan memodifikasi request web",
+          "Mendesain database",
+          "Menghapus virus"
+        ],
+        "question": "Apa fungsi utama Burp Suite?",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Mengganti hardware komputer",
+          "Melihat request dan response aplikasi web",
+          "Menginstal sistem operasi",
+          "Membuat kabel jaringan"
+        ],
+        "question": "Burp Suite dapat digunakan untuk...",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Internal Data Open Resource",
+          "Insecure Direct Object Reference",
+          "Internal Direct Object Request",
+          "Information Data Object Resource"
+        ],
+        "question": "Apa kepanjangan dari IDOR?",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": ["SQL Injection", "XSS", "Broken Access Control", "CSRF"],
+        "question": "IDOR termasuk dalam kategori...",
+        "timeLimit": 20,
+        "correctAnswer": 2
+      },
+      {
+        "options": [
+          "Password terlalu panjang",
+          "Tidak ada antivirus",
+          "Aplikasi tidak memverifikasi hak akses pengguna",
+          "RAM terlalu kecil"
+        ],
+        "question": "Kerentanan IDOR terjadi karena...",
+        "timeLimit": 20,
+        "correctAnswer": 2
+      },
+      {
+        "options": ["?color=red", "?id=1001", "?theme=dark", "?lang=id"],
+        "question": "Contoh parameter yang sering diuji pada IDOR adalah...",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": ["SQL Injection", "XSS", "IDOR", "Clickjacking"],
+        "question": "Jika pengguna dapat melihat data orang lain hanya dengan mengubah angka pada URL, maka kemungkinan terjadi...",
+        "timeLimit": 20,
+        "correctAnswer": 2
+      },
+      {
+        "options": [
+          "Membuat website lebih cepat",
+          "Dapat menyebabkan kebocoran data pengguna lain",
+          "Menghemat bandwidth",
+          "Menambah kapasitas server"
+        ],
+        "question": "Mengapa IDOR berbahaya?",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Mengubah parameter pada URL atau request",
+          "Menghapus database",
+          "Menginstal antivirus",
+          "Mengubah DNS"
+        ],
+        "question": "Apa yang biasanya dilakukan saat menguji IDOR?",
+        "timeLimit": 20,
+        "correctAnswer": 0
+      },
+      {
+        "options": ["Photoshop", "Burp Suite", "Microsoft Word", "WinRAR"],
+        "question": "Tool yang sering digunakan untuk memodifikasi request saat pengujian IDOR adalah...",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Aman",
+          "Lambat",
+          "Rentan terhadap IDOR",
+          "Sedang maintenance"
+        ],
+        "question": "Jika setelah parameter diubah muncul data pengguna lain, maka aplikasi...",
+        "timeLimit": 20,
+        "correctAnswer": 2
+      },
+      {
+        "options": [
+          "Password",
+          "ID pengguna atau objek data",
+          "Firewall",
+          "Antivirus"
+        ],
+        "question": "Dalam analogi loker, nomor loker mewakili...",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Pengguna mendapat hak akses lebih tinggi dari seharusnya",
+          "Server mengalami crash",
+          "Database penuh",
+          "Jaringan lambat"
+        ],
+        "question": "Apa yang dimaksud dengan Privilege Escalation?",
+        "timeLimit": 20,
+        "correctAnswer": 0
+      },
+      {
+        "options": [
+          "Admin menjadi user biasa",
+          "User biasa mendapatkan akses admin",
+          "User logout",
+          "User mengganti password"
+        ],
+        "question": "Contoh Privilege Escalation adalah...",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Broken Authentication",
+          "Session Fixation",
+          "Privilege Escalation",
+          "CSRF"
+        ],
+        "question": "Mahasiswa yang dapat mengakses fitur dosen merupakan contoh...",
+        "timeLimit": 20,
+        "correctAnswer": 2
+      },
+      {
+        "options": [
+          "Data dapat dimodifikasi tanpa izin",
+          "Data menjadi lebih aman",
+          "Data otomatis terenkripsi",
+          "Data menjadi lebih cepat diakses"
+        ],
+        "question": "Dampak Broken Access Control terhadap data adalah...",
+        "timeLimit": 20,
+        "correctAnswer": 0
+      },
+      {
+        "options": [
+          "Pengguna mengganti username",
+          "Penyerang mengambil alih akun korban",
+          "Pengguna logout otomatis",
+          "Pengguna menghapus akun"
+        ],
+        "question": "Apa yang dimaksud dengan Account Takeover?",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Pengelolaan sistem oleh pihak tidak berwenang",
+          "Website lebih aman",
+          "RAM bertambah",
+          "Koneksi lebih cepat"
+        ],
+        "question": "Akses tidak sah ke panel admin dapat menyebabkan...",
+        "timeLimit": 20,
+        "correctAnswer": 0
+      },
+      {
+        "options": [
+          "Full Privilege",
+          "Least Privilege",
+          "Anonymous Access",
+          "Open Access"
+        ],
+        "question": "Prinsip keamanan yang disarankan untuk mencegah Broken Access Control adalah...",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Semua pengguna menjadi admin",
+          "Pengguna mendapat akses minimum yang diperlukan",
+          "Semua fitur dibuka untuk semua pengguna",
+          "Tidak ada autentikasi"
+        ],
+        "question": "Least Privilege berarti...",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Browser pengguna",
+          "Client-side JavaScript",
+          "Server-side",
+          "URL"
+        ],
+        "question": "Pengecekan hak akses sebaiknya dilakukan di...",
+        "timeLimit": 20,
+        "correctAnswer": 2
+      },
+      {
+        "options": [
+          "Karena input dapat dimanipulasi",
+          "Karena input terlalu panjang",
+          "Karena browser selalu salah",
+          "Karena database tidak mendukung"
+        ],
+        "question": "Mengapa server tidak boleh mempercayai input pengguna secara langsung?",
+        "timeLimit": 20,
+        "correctAnswer": 0
+      },
+      {
+        "options": [
+          "Menonaktifkan login",
+          "Validasi setiap request yang masuk ke server",
+          "Menghapus cookie pengguna",
+          "Mengganti nama website"
+        ],
+        "question": "Salah satu cara mencegah Broken Access Control adalah...",
+        "timeLimit": 20,
+        "correctAnswer": 1
+      },
+      {
+        "options": [
+          "Menemukan kerentanan sebelum dieksploitasi",
+          "Mempercepat internet",
+          "Menambah kapasitas RAM",
+          "Mengurangi jumlah pengguna"
+        ],
+        "question": "Pengujian keamanan secara berkala bertujuan untuk...",
+        "timeLimit": 20,
+        "correctAnswer": 0
+      },
+      {
+        "options": [
+          "Semua pengguna harus menjadi admin",
+          "Keamanan hanya berfokus pada hacker dari luar",
+          "Setiap pengguna hanya boleh mengakses sesuai hak aksesnya",
+          "Semua data harus dapat diakses semua pengguna"
+        ],
+        "question": "Kesimpulan utama materi Broken Access Control adalah...",
+        "timeLimit": 20,
+        "correctAnswer": 2
       }
     ]
   }
