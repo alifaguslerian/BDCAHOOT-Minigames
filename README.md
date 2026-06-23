@@ -6,7 +6,7 @@ Realtime multiplayer quiz platform for student communities and events.
 - **Frontend**: HTML, CSS, Vanilla JS
 - **Backend**: Node.js + Express + Socket.IO
 - **Storage**: JSON file (`data/quizzes.json`)
-- **Deploy**: Railway
+- **Deploy**: Railway 
 
 ## Setup
 
